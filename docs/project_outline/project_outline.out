@@ -1,0 +1,19 @@
+\BOOKMARK [1][-]{section.1}{Literature review}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{Penalised Non-Negative Matrix Tri-Factorisation}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Drug sensitivity prediction}{section.1}% 3
+\BOOKMARK [2][-]{subsection.1.3}{Drug sensitivity prediction}{section.1}% 4
+\BOOKMARK [2][-]{subsection.1.4}{Performance}{section.1}% 5
+\BOOKMARK [1][-]{section.2}{Penalised Non-Negative Matrix Tri-Factorisation}{}% 6
+\BOOKMARK [2][-]{subsection.2.1}{Non-Negative Matrix Tri-Factorisation}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.2}{Adding penalisation}{section.2}% 8
+\BOOKMARK [2][-]{subsection.2.3}{Multiple penalisation matrices}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.4}{Dealing with missing values}{section.2}% 10
+\BOOKMARK [1][-]{section.3}{PNMTF for Missing Value Prediction}{}% 11
+\BOOKMARK [1][-]{section.4}{Datasets}{}% 12
+\BOOKMARK [1][-]{section.5}{PNMTF for Drug Sensitivity Prediction}{}% 13
+\BOOKMARK [2][-]{subsection.5.1}{Constructing similarity matrices for penalisation}{section.5}% 14
+\BOOKMARK [2][-]{subsection.5.2}{Prediction}{section.5}% 15
+\BOOKMARK [2][-]{subsection.5.3}{Biological interpretation}{section.5}% 16
+\BOOKMARK [1][-]{section.6}{Probabilistic PNMTF}{}% 17
+\BOOKMARK [1][-]{section.7}{Multi-type PNMTF}{}% 18
+\BOOKMARK [1][-]{section.8}{Project outline}{}% 19
