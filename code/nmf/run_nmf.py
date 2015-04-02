@@ -3,16 +3,17 @@ Load in the drug sensitivity dataset.
 Take out 10% of the values.
 Use Non-Negative Matrix Factorisation (I-divergence implementation) to 
 predict the missing values.
+
+Performance: MSE of ~3.1 on X_min dataset.
 """
 
-import numpy, sys, itertools, math, matplotlib.pyplot as plt
-sys.path.append("/home/tab43/Documents/Projects/libraries/")
+import sys
+sys.path.append("/home/thomas/Documenten/PhD/")#("/home/tab43/Documents/Projects/libraries/")
+import numpy, itertools, matplotlib.pyplot as plt
 from nmf_i_div.code.nmf import NMF
 import ml_helpers.code.mask as mask
 import ml_helpers.code.statistics as statistics
-
-dataset_location = "/home/tab43/Documents/Projects/drug_sensitivity/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensivitiy/"
-file_name = "ic50_excl_empty.txt"
+from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 
 
 # Try each of the values for k in the list <k_values>, and return the performances.
@@ -29,6 +30,7 @@ def try_different_k(X,M,no_folds,K_values,seed,iterations,updates):
     
 # Run NMF on different folds    
 def run_cross_validation(X,M,no_folds,K,seed,iterations,updates):
+    (I,J) = M.shape
     folds_M = mask.compute_folds(I,J,no_folds,seed,M)
     Ms = mask.compute_Ms(folds_M)
     assert_no_empty_rows_columns(Ms)
@@ -79,28 +81,12 @@ def run_NMF(X,M_training,M_test,K,iterations,updates):
 
      
 if __name__ == "__main__":
-    """ Load in data. We get a masked array, and set masked values to 0. """
-    data = numpy.genfromtxt(dataset_location+file_name,dtype=str,delimiter="\t",usemask=True)
-    
-    drug_names = data[0,3:]
-    cell_lines = data[1:,0]
-    cancer_types = data[1:,1]
-    tissues = data[1:,2]
-    
-    X = data[1:,3:] #numpy.array(data[1:,3:],dtype='f')
-    M = mask.calc_inverse_M(numpy.array(X.mask,dtype=float))
-    (I,J) = X.shape # 2200 drugs, 60 cancer cell lines
-    
-    """ For missing values we place 0. Our method requires non-negative values so we transform the values.
-        Exponential transform gives horrible performance, so we simply subtract the min from all values. """
-    X = numpy.array([[v if v else '0' for v in row] for row in X],dtype=float) #set missing values to 0
-    minimum = X.min()-1
-    X_min = numpy.array([[v-minimum if v else '0' for v in row] for row in X],dtype=float)
+    """ Load in data. """
+    (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger()
     
     # We can also treat negative values as missing values. 
     X_filtered = numpy.array([[0 if v < 0 else v for v in row] for row in X])
     M_filtered = numpy.array([[0 if (v < 0 or not M[i][j]) else 1 for j,v in enumerate(row)] for i,row in enumerate(X)])
-    
     
     """ Run NMF cross-validation for different K's """
     no_folds = 5
@@ -117,8 +103,6 @@ if __name__ == "__main__":
     """
     Note: MSE and i_div for X_min and X_filtered stay roughly the same for 
           different values of K (MSE of ~3.15 and ~2.1 resp.).
-    TODO: Try different initialisation to see whether we get a better fit.
-    TODO: Could try preprocessing (e.g. all values to a range [0,10]). Shouldn't make much of a difference.
     """    
     
     """ Plot the performances with varying K's """
