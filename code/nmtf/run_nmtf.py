@@ -5,12 +5,36 @@ Use Non-Negative Matrix Tri-Factorisation (I-divergence implementation) to
 predict the missing values.
 
 Performance (MSE) on X_min dataset:
+    
 Standard initialisation:
-- K=L=1  -> 3.1441809643762459
-- K=L=10 -> 3.1447522717912841
+- K=L=1  -> 3.14475
+- K=L=5  -> 3.14420747411
+- K=L=10 -> 3.14418096438
 - K=L=50 -> 
-Kmeans initialisation:
-TODO: this
+
+Kmeans initialisation (S to all 1's):
+            5 iterations    10 iterations   20 iterations   100 iterations
+- K=L=1  -> 3.14475         -               -               -
+- K=L=5  -> 3.08460959049   3.0532899867    3.03879916012   2.98422861127 (1st fold only)
+- K=L=10 -> 3.11872624757   
+- K=L=50 -> 
+
+Kmeans initialisation (S randomly from [0,1]):
+            5 iterations    10 iterations   20 iterations   100 iterations
+- K=L=1  -> 3.14475227179   -               -               -
+- K=L=5  -> 14.2546620532   7.99169398269   4.80329188879   3.09846431001 (1st fold only)
+
+
+Findings:
+
+Using the K-means initialisation offers a good performance
+increase over the regular initialisation; and running more iterations will
+give a better fit as well.
+
+Using Kmeans with S initialised randomly to [0,1] gives very slow convergence:
+only after <> iterations do we reach the same performance as initialising S 
+to all 1's.
+
 """
 
 import sys
@@ -20,6 +44,10 @@ from nmtf_i_div.code.nmtf import NMTF
 import ml_helpers.code.mask as mask
 import ml_helpers.code.statistics as statistics
 from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
+
+
+use_kmeans = True
+seed_kmeans = 1
 
 
 # Try each of the values for k in the list <k_values>, and return the performances.
@@ -44,7 +72,7 @@ def run_cross_validation(X,M,no_folds,K,L,seed,iterations,updates):
     MSEs = []
     i_divs = []
     for fold in range(0,no_folds):
-        print "Fold %s for k=%s." % (fold+1,K)
+        print "Fold %s for k=%s,l=%s." % (fold+1,K,L)
         M_training = Ms[fold]
         M_test = folds_M[fold]
         assert numpy.array_equal(M_training+M_test, M)
@@ -74,7 +102,7 @@ def assert_no_empty_rows_columns(Ms):
 # Run NMTF on the training data X, with known values <M_training> and test entries <M_test>.
 def run_NMTF(X,M_training,M_test,K,L,iterations,updates):
     nmtf = NMTF(X,M_training,K,L)
-    nmtf.initialise()
+    nmtf.initialise(use_kmeans,seed_kmeans)
     nmtf.run(iterations,updates)
     X_pred = nmtf.R_pred
     
@@ -97,12 +125,13 @@ if __name__ == "__main__":
     """ Run NMTF cross-validation for different K's """
     no_folds = 5
     seed = 0
-    iterations = 5
+    iterations = 100
     updates = 1
     
-    K = 1
-    L = 1
-    print run_cross_validation(X_min,M,no_folds,K,L,seed,iterations,updates)
+    K = 5
+    L = 5
+    (MSEs,i_divs) = run_cross_validation(X_min,M,no_folds,K,L,seed,iterations,updates)
+    print sum(MSEs)/float(len(MSEs))
     #print run_cross_validation(X_filtered,M_filtered,no_folds,10,seed,iterations,updates)
     
     #K_L_values = itertools.product(range(1,2+1),range(1,2+1))
