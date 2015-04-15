@@ -10,19 +10,22 @@ Standard initialisation:
 - K=L=1  -> 3.14475
 - K=L=5  -> 3.14420747411
 - K=L=10 -> 3.14418096438
-- K=L=50 -> 
 
 Kmeans initialisation (S to all 1's):
-            5 iterations    10 iterations   20 iterations   100 iterations
+            5 iterations    10 iterations   20 iterations   100 iterations  1000 iterations
 - K=L=1  -> 3.14475         -               -               -
-- K=L=5  -> 3.08460959049   3.0532899867    3.03879916012   2.98422861127 (1st fold only)
+- K=L=5  -> 3.08460959049   3.0532899867    3.03879916012   3.02687957842   2.88608055993
 - K=L=10 -> 3.11872624757   
-- K=L=50 -> 
 
 Kmeans initialisation (S randomly from [0,1]):
             5 iterations    10 iterations   20 iterations   100 iterations
 - K=L=1  -> 3.14475227179   -               -               -
 - K=L=5  -> 14.2546620532   7.99169398269   4.80329188879   3.09846431001 (1st fold only)
+
+S before F and G, Kmeans initialisation (S to all 1's):
+            5 iterations    10 iterations   20 iterations   100 iterations  1000 iterations
+- K=L=1  -> 3.14475227179   -               -               -
+- K=L=5  -> 3.87658046398   3.39345862811   3.11654697979   3.02607177499   2.85277569876
 
 
 Findings:
@@ -35,6 +38,11 @@ Using Kmeans with S initialised randomly to [0,1] gives very slow convergence:
 only after <> iterations do we reach the same performance as initialising S 
 to all 1's.
 
+When doing the updates to F and G before S, G ~= [0,2], and F ~= [0,20+].
+When doing the updates to S before F and G, G ~= [0,1.5], and F ~= [0,2.3].
+So doing S first gives better cluster indicators.
+The price for that is slower convergence initially (but same performance at 100 iterations).
+
 """
 
 import sys
@@ -46,8 +54,10 @@ import ml_helpers.code.statistics as statistics
 from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 
 
+# Settings
 use_kmeans = True
 seed_kmeans = 1
+S_first = True
 
 
 # Try each of the values for k in the list <k_values>, and return the performances.
@@ -103,7 +113,7 @@ def assert_no_empty_rows_columns(Ms):
 def run_NMTF(X,M_training,M_test,K,L,iterations,updates):
     nmtf = NMTF(X,M_training,K,L)
     nmtf.initialise(use_kmeans,seed_kmeans)
-    nmtf.run(iterations,updates)
+    nmtf.run(iterations,updates,S_first)
     X_pred = nmtf.R_pred
     
     # Calculate MSE of predictions.
