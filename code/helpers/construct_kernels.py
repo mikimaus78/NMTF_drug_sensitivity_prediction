@@ -32,6 +32,17 @@ tissue_subtype_start_index = cancer_gene_start_index+71
 """
 HELPER METHODS
 """
+# Method for loading in a file where the first line is names of the columns, 
+# the first column is names of rows, and values are of the specified datatype.
+def read_file_with_names(location,datatype=float):
+    lines = open(location,'r').readlines()
+    lines = [line.split("\n")[0].split("\t") for line in lines]
+    names_columns = lines[0]
+    values = numpy.array(lines[1:])
+    names_rows = values[:,0]
+    values = numpy.array(values[:,1:],dtype=datatype)
+    return (names_columns,names_rows,values)
+
 # Method for removing features (columns) with only the same value.
 def remove_homogenous_features(matrix,names):
     columns_to_remove = []
@@ -63,22 +74,55 @@ def remove_matrix_rows(matrix,all_names,keep_names):
     new_matrix = numpy.delete(matrix,rows_to_remove,axis=0)
     return new_matrix
 
-# Method for storing the feature matrices for cell lines, first row the feature
-# names, and then each row first the cell line names, then all the feature values
-def store_cell_line_features(location,matrix,cell_line_names,feature_names):
+# Method for storing the feature matrices for cell lines/drugs, first row the 
+# feature names, and then each row first the cell line/drug names, then all the 
+# feature values.
+def store_features(location,matrix,column_names,feature_names):
     fout = open(location,'w')
     line = "\t".join(feature_names) + "\n"
     fout.write(line)
-    for cell_line_name,row in zip(cell_line_names,matrix):
+    for cell_line_name,row in zip(column_names,matrix):
         line = cell_line_name + "\t" + "\t".join([str(v) for v in row]) + "\n"
         fout.write(line)
     fout.close()
     
+# Method for storing the kernels - first row is cancer cell line/drug names, then kernel values
+def store_kernel(location,matrix,names):
+    fout = open(location,'w')
+    line = "\t".join(names) + "\n"
+    fout.write(line)
+    for row in matrix:
+        line = "\t".join([str(v) for v in row]) + "\n"
+        fout.write(line)
+    fout.close()
+
+
 
 """
 KERNEL METHODS
 Methods for computing the kernels - specifically Jaccard coefficient and Gaussian.
+
+Jaccard(a1,a2) = |a1 and a2| / |a1 or a2|
+We take 1-Jaccard(a1,a2) as we want our kernels to measure dissimilarity.
 """
+# Jaccard coefficient
+def jaccard_kernel(values):
+    # Rows are data points
+    no_points = numpy.array(values).shape[0]
+    kernel = numpy.zeros((no_points,no_points))
+    for i,data_point_1 in enumerate(values):
+        for j,data_point_2 in enumerate(values):
+            kernel[i,j] = 1 - jaccard(data_point_1,data_point_2)
+    return kernel
+    
+def jaccard(a1,a2):
+    a_and = [1 for (v1,v2) in zip(a1,a2) if v1 == 1 and v2 == 1]
+    a_or = [1 for (v1,v2) in zip(a1,a2) if v1 == 1 or v2 == 1]
+    return 1 if len(a_or) == 0 else len(a_and) / float(len(a_or))
+
+# Gaussian kernel
+def gaussian_kernel(values):        
+    return []
 
 
 
@@ -122,9 +166,6 @@ def construct_filtered_feature_matrices_cell_lines():
     
     cancer_gene_names = features[cancer_gene_start_index:tissue_subtype_start_index,0]
     cancer_gene_values = numpy.array(features[cancer_gene_start_index:tissue_subtype_start_index,1:],dtype=float).T
-        
-    tissue_subtype_names = features[tissue_subtype_start_index:,0]
-    tissue_subtype_values = numpy.array(features[tissue_subtype_start_index:,1:],dtype=float).T
     
     
     # Filter out rows for all the same values - which is none in this dataset (but we still check)
@@ -175,28 +216,47 @@ def construct_filtered_feature_matrices_cell_lines():
         cancer_types=Sanger_cancer_types_filtered,
         tissues=Sanger_tissues_filtered)
     
-    store_cell_line_features(   # gene expression values
+    store_features(   # gene expression values
         location=output_cell_line_features_location+gene_expression_kernel_name,
         matrix=gene_expression_values_filtered,
-        cell_line_names=overlap_cell_lines,
+        column_names=overlap_cell_lines,
         feature_names=gene_expression_names)
-    store_cell_line_features(   # copy number values
+    store_features(   # copy number values
         location=output_cell_line_features_location+copy_variation_kernel_name,
         matrix=copy_number_values_filtered,
-        cell_line_names=overlap_cell_lines,
+        column_names=overlap_cell_lines,
         feature_names=copy_number_names)
-    store_cell_line_features(   # cancer gene mutation values
+    store_features(   # cancer gene mutation values
         location=output_cell_line_features_location+cancer_gene_mutation_kernel_name,
         matrix=cancer_gene_values_filtered,
-        cell_line_names=overlap_cell_lines,
+        column_names=overlap_cell_lines,
         feature_names=cancer_gene_names)
 
 
-#def constuct_cell_line_kernels():
 
+""" Use the earlier created feature matrices to construct feature kernels. """
+def constuct_cell_line_kernels():
+    # Gene expression kernel
+    (gene_expression_names,cell_line_names,gene_expression_values) = read_file_with_names(output_cell_line_features_location+gene_expression_kernel_name,datatype=float)
+    gene_expression_kernel = gaussian_kernel(gene_expression_values)    
+    
+    # Copy number kernel
+    (copy_number_names,cell_line_names,copy_number_values) = read_file_with_names(output_cell_line_features_location+copy_variation_kernel_name,datatype=float)
+    copy_number_kernel = gaussian_kernel(copy_number_values)
+    
+    # Cancer gene mutation kernel
+    (cancer_gene_names,cell_line_names,cancer_gene_values) = read_file_with_names(output_cell_line_features_location+cancer_gene_mutation_kernel_name,datatype=float)
+    cancer_gene_kernel = jaccard_kernel(cancer_gene_values)
 
     
+    # Store these kernels
+    store_kernel(output_kernel_location+gene_expression_kernel_name,gene_expression_kernel,cell_line_names)
+    store_kernel(output_kernel_location+copy_variation_kernel_name,copy_number_kernel,cell_line_names)
+    store_kernel(output_kernel_location+cancer_gene_mutation_kernel_name,cancer_gene_kernel,cell_line_names)
+    
+
+
 if __name__ == "__main__":
-    #constuct_cell_line_kernels()
+    constuct_cell_line_kernels()
     pass
 
