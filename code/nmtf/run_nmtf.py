@@ -27,6 +27,9 @@ S before F and G, Kmeans initialisation (S to all 1's):
 - K=L=1  -> 3.14475227179   -               -               -
 - K=L=5  -> 3.87658046398   3.39345862811   3.11654697979   3.02607177499   2.85277569876
 
+            2000 iterations 5000 iterations 10000 iterations
+- K=L=2  -> 
+- K=L=3  -> 
 
 Findings:
 
@@ -43,6 +46,17 @@ When doing the updates to S before F and G, G ~= [0,1.5], and F ~= [0,2.3].
 So doing S first gives better cluster indicators.
 The price for that is slower convergence initially (but same performance at 100 iterations).
 
+
+Standardised Sanger dataset:
+    
+S before F and G, Kmeans initialisation (S to all 1's):
+            5 iterations    10 iterations   20 iterations   100 iterations  500 iterations  1000 iterations
+- K=L=1  -> 0.870371549574  0.870371549574  -               -               -               -
+- K=L=5  -> 0.778403335661  0.740796354643  0.707632116702  0.667259433036  0.616872929724  0.59421880759
+- K=L=10 -> 0.836234871516  0.80792697128   0.763092721476  
+
+            1000 iterations 2000 iterations 5000 iterations 10000 iterations
+- K=L=2  ->   
 """
 
 import sys
@@ -55,9 +69,13 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 
 
 # Settings
+standardised = True
 use_kmeans = True
 seed_kmeans = 1
 S_first = True
+iterations = 2000
+K = 2
+L = 2
 
 
 # Try each of the values for k in the list <k_values>, and return the performances.
@@ -126,7 +144,7 @@ def run_NMTF(X,M_training,M_test,K,L,iterations,updates):
      
 if __name__ == "__main__":
     """ Load in data. """
-    (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger()
+    (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised)
     
     # We can also treat negative values as missing values. 
     X_filtered = numpy.array([[0 if v < 0 else v for v in row] for row in X])
@@ -135,11 +153,8 @@ if __name__ == "__main__":
     """ Run NMTF cross-validation for different K's """
     no_folds = 5
     seed = 0
-    iterations = 100
     updates = 1
     
-    K = 5
-    L = 5
     (MSEs,i_divs) = run_cross_validation(X_min,M,no_folds,K,L,seed,iterations,updates)
     print sum(MSEs)/float(len(MSEs))
     #print run_cross_validation(X_filtered,M_filtered,no_folds,10,seed,iterations,updates)

@@ -17,13 +17,15 @@ import numpy, sys
 sys.path.append("/home/thomas/Documenten/PhD/")
 import ml_helpers.code.mask as mask
 
-location_Sanger = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensivitiy/"
-#"/home/tab43/Documents/Projects/drug_sensitivity/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensivitiy/"
+location_Sanger = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensivity/"
+#"/home/tab43/Documents/Projects/drug_sensitivity/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensivity/"
 file_name = "ic50_excl_empty.txt"
+file_name_standardised = "ic50_excl_empty_standardised.txt"
 
-def load_Sanger():
+def load_Sanger(standardised=False):
     """ Load in data. We get a masked array, and set masked values to 0. """
-    data = numpy.genfromtxt(location_Sanger+file_name,dtype=str,delimiter="\t",usemask=True)
+    fin = location_Sanger + (file_name if not standardised else file_name_standardised)
+    data = numpy.genfromtxt(fin,dtype=str,delimiter="\t",usemask=True)
     
     drug_names = data[0,3:]
     cell_lines = data[1:,0]
