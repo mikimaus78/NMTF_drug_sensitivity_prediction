@@ -11,14 +11,17 @@ Returns:
     cell_lines      List of which cell lines they are
     cancer_types    List of the cancer types of the cell lines
     tissues         List of tissue types of the cell lines
+    
+Also have a helper for storing it back into a file.
 """
 
 import numpy, sys
-sys.path.append("/home/thomas/Documenten/PhD/")
+#sys.path.append("/home/thomas/Documenten/PhD/")
+sys.path.append("/home/tab43/Documents/Projects/libraries/")
 import ml_helpers.code.mask as mask
 
-location_Sanger = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensivity/"
-#"/home/tab43/Documents/Projects/drug_sensitivity/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensivity/"
+#location_Sanger = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensivity/"
+location_Sanger = "/home/tab43/Documents/Projects/drug_sensitivity/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensivitiy/"
 file_name = "ic50_excl_empty.txt"
 file_name_standardised = "ic50_excl_empty_standardised.txt"
 
@@ -43,3 +46,19 @@ def load_Sanger(standardised=False):
     X_min = numpy.array([[v-minimum if v else '0' for v in row] for row in X],dtype=float)
     
     return (X,X_min,M,drug_names,cell_lines,cancer_types,tissues)
+    
+    
+def store_Sanger(location,X,M,drug_names,cell_lines,cancer_types,tissues):
+    ''' Store the data X. First line is drug names, then comes the data.
+        For the data, first column is cell line name, second is cancer type, 
+        third is tissue, then follows the drug sensitivity values.
+        For missing values we store nothing '''
+    fout = open(location,'w')
+    fout.write("Cell Line\tCancer Type\tTissue\t" + "\t".join(drug_names) + "\n")
+    
+    for i,(cell_line,cancer_type,tissue,row) in enumerate(zip(cell_lines,cancer_types,tissues,X)):
+        line = cell_line+"\t"+cancer_type+"\t"+tissue+"\t"
+        data = [str(val) if M[i][j] else ""for (j,val) in enumerate(row)]
+        line += "\t".join(data) + "\n"
+        fout.write(line)
+    fout.close()
