@@ -6,7 +6,7 @@ Also construct a new dataset for the drug sensitivity values, consisting of
 only those cancer cell lines for which we have features available.
 There are 622 such cell lines.
 """
-import numpy
+import numpy, math
 import load_data
 
 location_cell_line_features = "/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/cell_line_features/"
@@ -107,12 +107,19 @@ We take 1-Jaccard(a1,a2) as we want our kernels to measure dissimilarity.
 """
 # Jaccard coefficient
 def jaccard_kernel(values):
+    print "Computing Jaccard kernel..."
     # Rows are data points
     no_points = numpy.array(values).shape[0]
     kernel = numpy.zeros((no_points,no_points))
-    for i,data_point_1 in enumerate(values):
-        for j,data_point_2 in enumerate(values):
-            kernel[i,j] = 1 - jaccard(data_point_1,data_point_2)
+    for i in range(0,no_points):
+        print "Data point %s." % i
+        data_point_1 = values[i]
+        for j in range(i,no_points):
+            data_point_2 = values[j]
+            sim = jaccard(data_point_1,data_point_2)
+            kernel[i,j] = 1 - sim
+            kernel[j,i] = 1 - sim
+    assert numpy.array_equal(kernel,kernel.T), "Constructed kernel but did not become symmetrical!"
     return kernel
     
 def jaccard(a1,a2):
@@ -120,10 +127,26 @@ def jaccard(a1,a2):
     a_or = [1 for (v1,v2) in zip(a1,a2) if v1 == 1 or v2 == 1]
     return 1 if len(a_or) == 0 else len(a_and) / float(len(a_or))
 
-# Gaussian kernel
-def gaussian_kernel(values):        
-    return []
 
+# Gaussian kernel
+def gaussian_kernel(values): 
+    print "Computing Gaussian kernel..."
+    no_points = numpy.array(values).shape[0]
+    kernel = numpy.zeros((no_points,no_points))
+    for i in range(0,no_points):
+        print "Data point %s." % i
+        data_point_1 = values[i]
+        for j in range(i,no_points):
+            data_point_2 = values[j]
+            sim = gaussian(data_point_1,data_point_2,1)
+            kernel[i,j] = 1 - sim
+            kernel[j,i] = 1 - sim
+    assert numpy.array_equal(kernel,kernel.T), "Constructed kernel but did not become symmetrical!"
+    return kernel
+
+def gaussian(a1,a2,std):
+    distance = sum([(x1-x2)**2 for x1,x2 in zip(a1,a2)])
+    return math.exp( -distance / std**2)
 
 
 """
@@ -156,7 +179,6 @@ def construct_filtered_feature_matrices_cell_lines():
     features = numpy.array(lines[1:])
     cell_line_names = lines[0]
     
-    
     # Extract the features, and feature names
     gene_expression_names = features[gene_start_index:copy_number_start_index,0]
     gene_expression_values = numpy.array(features[gene_start_index:copy_number_start_index,1:],dtype=float).T
@@ -167,12 +189,10 @@ def construct_filtered_feature_matrices_cell_lines():
     cancer_gene_names = features[cancer_gene_start_index:tissue_subtype_start_index,0]
     cancer_gene_values = numpy.array(features[cancer_gene_start_index:tissue_subtype_start_index,1:],dtype=float).T
     
-    
     # Filter out rows for all the same values - which is none in this dataset (but we still check)
     (gene_expression_values,gene_expression_names) = remove_homogenous_features(gene_expression_values,gene_expression_names)
     (copy_number_values,copy_number_names) = remove_homogenous_features(copy_number_values,copy_number_names)
     (cancer_gene_values,cancer_gene_names) = remove_homogenous_features(cancer_gene_values,cancer_gene_names)
-    
     
     # Reorder the rows in the datasets so that they are in alphabetical order of cell line name
     gene_expression_values = sort_matrix_rows(gene_expression_values,cell_line_names)
@@ -182,7 +202,6 @@ def construct_filtered_feature_matrices_cell_lines():
     # Also reorder the names
     sorted_cell_line_names = sorted(cell_line_names)
     
-    
     # Load in the Sanger dataset, and the names of the cell lines etc. Then sort it on cell line name alphabetically
     (X,_,M,Sanger_drug_names,Sanger_cell_lines,Sanger_cancer_types,Sanger_tissues) = load_data.load_Sanger()
     X_sorted = sort_matrix_rows(X,Sanger_cell_lines)
@@ -190,7 +209,6 @@ def construct_filtered_feature_matrices_cell_lines():
     
     (sorted_Sanger_cell_lines,sorted_Sanger_cancer_types,sorted_Sanger_tissues) = \
         (numpy.array(t) for t in zip(*sorted(zip(Sanger_cell_lines,Sanger_cancer_types,Sanger_tissues))))
-    
     
     # Filter out the cell lines that are in common between the features and the drug sensivitity dataset
     overlap_cell_lines = intersection(sorted_Sanger_cell_lines,sorted_cell_line_names)
@@ -204,7 +222,6 @@ def construct_filtered_feature_matrices_cell_lines():
     gene_expression_values_filtered = remove_matrix_rows(gene_expression_values,sorted_cell_line_names,overlap_cell_lines)
     copy_number_values_filtered = remove_matrix_rows(copy_number_values,sorted_cell_line_names,overlap_cell_lines)
     cancer_gene_values_filtered = remove_matrix_rows(cancer_gene_values,sorted_cell_line_names,overlap_cell_lines)
-    
     
     # Store the new X, as well as the feature matrices
     load_data.store_Sanger(
@@ -233,26 +250,23 @@ def construct_filtered_feature_matrices_cell_lines():
         feature_names=cancer_gene_names)
 
 
-
 """ Use the earlier created feature matrices to construct feature kernels. """
 def constuct_cell_line_kernels():
     # Gene expression kernel
     (gene_expression_names,cell_line_names,gene_expression_values) = read_file_with_names(output_cell_line_features_location+gene_expression_kernel_name,datatype=float)
-    gene_expression_kernel = gaussian_kernel(gene_expression_values)    
+    gene_expression_kernel = gaussian_kernel(gene_expression_values)  
+    store_kernel(output_kernel_location+gene_expression_kernel_name,gene_expression_kernel,cell_line_names)  
     
     # Copy number kernel
     (copy_number_names,cell_line_names,copy_number_values) = read_file_with_names(output_cell_line_features_location+copy_variation_kernel_name,datatype=float)
     copy_number_kernel = gaussian_kernel(copy_number_values)
+    store_kernel(output_kernel_location+copy_variation_kernel_name,copy_number_kernel,cell_line_names)
     
     # Cancer gene mutation kernel
     (cancer_gene_names,cell_line_names,cancer_gene_values) = read_file_with_names(output_cell_line_features_location+cancer_gene_mutation_kernel_name,datatype=float)
     cancer_gene_kernel = jaccard_kernel(cancer_gene_values)
-
-    
-    # Store these kernels
-    store_kernel(output_kernel_location+gene_expression_kernel_name,gene_expression_kernel,cell_line_names)
-    store_kernel(output_kernel_location+copy_variation_kernel_name,copy_number_kernel,cell_line_names)
     store_kernel(output_kernel_location+cancer_gene_mutation_kernel_name,cancer_gene_kernel,cell_line_names)
+
     
 
 

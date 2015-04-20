@@ -20,8 +20,8 @@ import numpy, sys
 sys.path.append("/home/tab43/Documents/Projects/libraries/")
 import ml_helpers.code.mask as mask
 
-#location_Sanger = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensivity/"
-location_Sanger = "/home/tab43/Documents/Projects/drug_sensitivity/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensivitiy/"
+#location_Sanger = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensitivity/"
+location_Sanger = "/home/tab43/Documents/Projects/drug_sensitivity/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensitivity/"
 file_name = "ic50_excl_empty.txt"
 file_name_standardised = "ic50_excl_empty_standardised.txt"
 

@@ -60,7 +60,8 @@ S before F and G, Kmeans initialisation (S to all 1's):
 """
 
 import sys
-sys.path.append("/home/thomas/Documenten/PhD/")#("/home/tab43/Documents/Projects/libraries/")
+sys.path.append("/home/tab43/Documents/Projects/drug_sensitivity/")
+sys.path.append("/home/tab43/Documents/Projects/libraries/")#("/home/thomas/Documenten/PhD/")
 import numpy, itertools, matplotlib.pyplot as plt
 from nmtf_i_div.code.nmtf import NMTF
 import ml_helpers.code.mask as mask
@@ -69,13 +70,13 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 
 
 # Settings
-standardised = True
-use_kmeans = True
+standardised = False
+use_kmeans = False
 seed_kmeans = 1
 S_first = True
-iterations = 2000
-K = 2
-L = 2
+iterations = 10
+K = 1
+L = 1
 
 
 # Try each of the values for k in the list <k_values>, and return the performances.
