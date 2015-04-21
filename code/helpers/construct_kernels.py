@@ -284,7 +284,6 @@ def standardise_features():
         feature_names=copy_number_names)
     
     
-
 """ Use the earlier created feature matrices to construct feature kernels. """
 def constuct_cell_line_kernels():
     # Gene expression kernel
@@ -303,9 +302,31 @@ def constuct_cell_line_kernels():
     store_kernel(output_kernel_location+cancer_gene_mutation_kernel_name,cancer_gene_kernel,cell_line_names)
 
     
+    
+"""
+DRUG KERNELS
+
+There are 140 drugs.
+
+We get the following features:
+- PubChem fingerprints
+- 1&2D descriptors (PaDeL)
+- Drug targets (Sanger)
+- Vsurf (PaDeL 2D -> LigPrep -> Molecular Operating Environment Software)
+- GRIND/GRIND2 (PaDeL 2D -> Pentacle)
+
+We end up with the following kernels:
+
+Feature type            Number of features      Kernel
+PubChem                 _                       Jaccard
+1&2D descriptors        _                       Gaussian
+Drug targets            _                       Jaccard
+Vsurf                   _                       Gaussian
+GRIND/GRIND2            _                       Gaussian
+"""
 
 
 if __name__ == "__main__":
-    constuct_cell_line_kernels()
+    #constuct_cell_line_kernels()
     pass
 
