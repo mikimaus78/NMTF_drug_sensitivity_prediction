@@ -74,6 +74,13 @@ def remove_matrix_rows(matrix,all_names,keep_names):
     new_matrix = numpy.delete(matrix,rows_to_remove,axis=0)
     return new_matrix
 
+# Method for standardising the columns of a matrix
+def standardise_columns(matrix):
+    mean_columns = numpy.mean(matrix,axis=0) #column-wise mean, std
+    std_columns = numpy.std(matrix,axis=0)
+    matrix_standardised = ( matrix - [mean_columns for i in range(0,len(matrix))] ) / [std_columns for i in range(0,len(matrix))]
+    return matrix_standardised
+
 # Method for storing the feature matrices for cell lines/drugs, first row the 
 # feature names, and then each row first the cell line/drug names, then all the 
 # feature values.
@@ -95,8 +102,7 @@ def store_kernel(location,matrix,names):
         line = "\t".join([str(v) for v in row]) + "\n"
         fout.write(line)
     fout.close()
-
-
+    
 
 """
 KERNEL METHODS
@@ -131,22 +137,24 @@ def jaccard(a1,a2):
 # Gaussian kernel
 def gaussian_kernel(values): 
     print "Computing Gaussian kernel..."
-    no_points = numpy.array(values).shape[0]
+    (no_points,no_features) = numpy.array(values).shape
+    sigma_2 = math.sqrt( no_features / 4. ) # The KMF paper used sigma^2 = sqrt(D/4) for D = no. features
     kernel = numpy.zeros((no_points,no_points))
     for i in range(0,no_points):
         print "Data point %s." % i
         data_point_1 = values[i]
         for j in range(i,no_points):
             data_point_2 = values[j]
-            sim = gaussian(data_point_1,data_point_2,1)
+            sim = gaussian(data_point_1,data_point_2,sigma_2)
             kernel[i,j] = 1 - sim
             kernel[j,i] = 1 - sim
     assert numpy.array_equal(kernel,kernel.T), "Constructed kernel but did not become symmetrical!"
     return kernel
 
-def gaussian(a1,a2,std):
+def gaussian(a1,a2,sigma_2):
     distance = sum([(x1-x2)**2 for x1,x2 in zip(a1,a2)])
-    return math.exp( -distance / std**2)
+    print distance,sigma_2
+    return math.exp( -distance / (2.*sigma_2) )
 
 
 """
@@ -250,15 +258,42 @@ def construct_filtered_feature_matrices_cell_lines():
         feature_names=cancer_gene_names)
 
 
+"""
+Standardise the feature matrices for the Gaussian kernel by feature, to mean 0 
+and std 1.
+"""
+def standardise_features():
+    # Load in the non-standardised features
+    (gene_expression_names,cell_line_names,gene_expression_values) = read_file_with_names(output_cell_line_features_location+gene_expression_kernel_name,datatype=float)
+    (copy_number_names,cell_line_names,copy_number_values) = read_file_with_names(output_cell_line_features_location+copy_variation_kernel_name,datatype=float)
+    
+    # Rows are cell lines, columns features, so we standardise the columns
+    gene_expression_values_standardised = standardise_columns(gene_expression_values) 
+    copy_number_values_standardised = standardise_columns(copy_number_values)    
+    
+    # Write the standardised features
+    store_features(   # gene expression values
+        location=output_cell_line_features_location+gene_expression_kernel_name+"_std",
+        matrix=gene_expression_values_standardised,
+        column_names=cell_line_names,
+        feature_names=gene_expression_names)
+    store_features(   # copy number values
+        location=output_cell_line_features_location+copy_variation_kernel_name+"_std",
+        matrix=copy_number_values_standardised,
+        column_names=cell_line_names,
+        feature_names=copy_number_names)
+    
+    
+
 """ Use the earlier created feature matrices to construct feature kernels. """
 def constuct_cell_line_kernels():
     # Gene expression kernel
-    (gene_expression_names,cell_line_names,gene_expression_values) = read_file_with_names(output_cell_line_features_location+gene_expression_kernel_name,datatype=float)
+    (gene_expression_names,cell_line_names,gene_expression_values) = read_file_with_names(output_cell_line_features_location+gene_expression_kernel_name+"_std",datatype=float)
     gene_expression_kernel = gaussian_kernel(gene_expression_values)  
     store_kernel(output_kernel_location+gene_expression_kernel_name,gene_expression_kernel,cell_line_names)  
     
     # Copy number kernel
-    (copy_number_names,cell_line_names,copy_number_values) = read_file_with_names(output_cell_line_features_location+copy_variation_kernel_name,datatype=float)
+    (copy_number_names,cell_line_names,copy_number_values) = read_file_with_names(output_cell_line_features_location+copy_variation_kernel_name+"_std",datatype=float)
     copy_number_kernel = gaussian_kernel(copy_number_values)
     store_kernel(output_kernel_location+copy_variation_kernel_name,copy_number_kernel,cell_line_names)
     

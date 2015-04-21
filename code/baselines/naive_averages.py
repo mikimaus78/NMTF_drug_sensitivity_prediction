@@ -9,7 +9,7 @@ Performance:
 """
 
 import sys
-sys.path.append("/home/thomas/Documenten/PhD/")#("/home/tab43/Documents/Projects/libraries/")
+sys.path.append("/home/tab43/Documents/Projects/libraries/")#("/home/thomas/Documenten/PhD/")
 import numpy, itertools
 import ml_helpers.code.mask as mask
 import ml_helpers.code.statistics as statistics
@@ -82,6 +82,7 @@ def f_overall(X,M_training,M_test):
     X_pred = numpy.array([[average for j in range(0,J)] for i in range(0,I)])
     MSE = statistics.MSE(X,X_pred,M_test)
     return MSE
+    
     
 if __name__ == "__main__":
     (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger()
