@@ -16,8 +16,8 @@ Also have a helper for storing it back into a file.
 """
 
 import numpy, sys
-#sys.path.append("/home/thomas/Documenten/PhD/")
-sys.path.append("/home/tab43/Documents/Projects/libraries/")
+sys.path.append("/home/thomas/Documenten/PhD/libraries/")
+#sys.path.append("/home/tab43/Documents/Projects/libraries/")
 import ml_helpers.code.mask as mask
 
 #location_Sanger = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensitivity/"

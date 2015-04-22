@@ -9,24 +9,9 @@ There are 622 such cell lines.
 import numpy, math
 import load_data
 
-location_cell_line_features = "/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/cell_line_features/"
-name_cell_line_features = "en_input_w5.csv"
-
-output_kernel_location = "/home/tab43/Documents/Projects/drug_sensitivity/NMTF_drug_sensitivity_prediction/data/kernels/"
-
+output_kernel_location = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/kernels/"#"/home/tab43/Documents/Projects/drug_sensitivity/NMTF_drug_sensitivity_prediction/data/kernels/"
 output_Sanger_location = "/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/"
 name_Sanger_filtered = "ic50_excl_empty_features.txt"
-
-output_cell_line_features_location = "/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/cell_line_features/"
-
-gene_expression_kernel_name = "gene_expression"
-copy_variation_kernel_name = "copy_variation"
-cancer_gene_mutation_kernel_name = "mutation"
-
-gene_start_index = 0
-copy_number_start_index = gene_start_index+13321
-cancer_gene_start_index = copy_number_start_index+426
-tissue_subtype_start_index = cancer_gene_start_index+71
 
 
 """
@@ -42,6 +27,16 @@ def read_file_with_names(location,datatype=float):
     names_rows = values[:,0]
     values = numpy.array(values[:,1:],dtype=datatype)
     return (names_columns,names_rows,values)
+
+# Read csv file, comma separated. First row is "Name" + feature names, first 
+# column is drug/cell line names. Return (names_columns,names_rows,values) tuple.
+def read_csv_file(location,delim=','):
+    lines = numpy.array([line.split("\n")[0].split(delim) for line in open(location,'r').readlines()])
+    feature_names = lines[0,1:]
+    row_names = lines[1:,0]
+    values = lines[1:,1:]
+    values = numpy.array(lines[1:,1:],dtype=float)
+    return (feature_names,row_names,values)
 
 # Method for removing features (columns) with only the same value.
 def remove_homogenous_features(matrix,names):
@@ -84,12 +79,12 @@ def standardise_columns(matrix):
 # Method for storing the feature matrices for cell lines/drugs, first row the 
 # feature names, and then each row first the cell line/drug names, then all the 
 # feature values.
-def store_features(location,matrix,column_names,feature_names):
+def store_features(location,matrix,row_names,feature_names):
     fout = open(location,'w')
     line = "\t".join(feature_names) + "\n"
     fout.write(line)
-    for cell_line_name,row in zip(column_names,matrix):
-        line = cell_line_name + "\t" + "\t".join([str(v) for v in row]) + "\n"
+    for row_name,row in zip(row_names,matrix):
+        line = row_name + "\t" + "\t".join([str(v) for v in row]) + "\n"
         fout.write(line)
     fout.close()
     
@@ -102,6 +97,8 @@ def store_kernel(location,matrix,names):
         line = "\t".join([str(v) for v in row]) + "\n"
         fout.write(line)
     fout.close()
+    
+    
     
 
 """
@@ -153,7 +150,6 @@ def gaussian_kernel(values):
 
 def gaussian(a1,a2,sigma_2):
     distance = sum([(x1-x2)**2 for x1,x2 in zip(a1,a2)])
-    print distance,sigma_2
     return math.exp( -distance / (2.*sigma_2) )
 
 
@@ -180,6 +176,21 @@ Gene expression         13321                 Gaussian
 Copy number             426                   Gaussian
 Cancer gene mutations   71                    Jaccard
 """
+location_cell_line_features = "/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/cell_line_features/"
+name_cell_line_features = "en_input_w5.csv"
+
+output_cell_line_features_location = "/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/cell_line_features/"
+
+gene_expression_kernel_name = "gene_expression"
+copy_variation_kernel_name = "copy_variation"
+cancer_gene_mutation_kernel_name = "mutation"
+
+gene_start_index = 0
+copy_number_start_index = gene_start_index+13321
+cancer_gene_start_index = copy_number_start_index+426
+tissue_subtype_start_index = cancer_gene_start_index+71
+
+
 def construct_filtered_feature_matrices_cell_lines():
     # Load in the feature sets
     lines = open(location_cell_line_features+name_cell_line_features,'r').readlines()
@@ -244,17 +255,17 @@ def construct_filtered_feature_matrices_cell_lines():
     store_features(   # gene expression values
         location=output_cell_line_features_location+gene_expression_kernel_name,
         matrix=gene_expression_values_filtered,
-        column_names=overlap_cell_lines,
+        row_names=overlap_cell_lines,
         feature_names=gene_expression_names)
     store_features(   # copy number values
         location=output_cell_line_features_location+copy_variation_kernel_name,
         matrix=copy_number_values_filtered,
-        column_names=overlap_cell_lines,
+        row_names=overlap_cell_lines,
         feature_names=copy_number_names)
     store_features(   # cancer gene mutation values
         location=output_cell_line_features_location+cancer_gene_mutation_kernel_name,
         matrix=cancer_gene_values_filtered,
-        column_names=overlap_cell_lines,
+        row_names=overlap_cell_lines,
         feature_names=cancer_gene_names)
 
 
@@ -262,7 +273,7 @@ def construct_filtered_feature_matrices_cell_lines():
 Standardise the feature matrices for the Gaussian kernel by feature, to mean 0 
 and std 1.
 """
-def standardise_features():
+def standardise_features_cell_lines():
     # Load in the non-standardised features
     (gene_expression_names,cell_line_names,gene_expression_values) = read_file_with_names(output_cell_line_features_location+gene_expression_kernel_name,datatype=float)
     (copy_number_names,cell_line_names,copy_number_values) = read_file_with_names(output_cell_line_features_location+copy_variation_kernel_name,datatype=float)
@@ -275,12 +286,12 @@ def standardise_features():
     store_features(   # gene expression values
         location=output_cell_line_features_location+gene_expression_kernel_name+"_std",
         matrix=gene_expression_values_standardised,
-        column_names=cell_line_names,
+        row_names=cell_line_names,
         feature_names=gene_expression_names)
     store_features(   # copy number values
         location=output_cell_line_features_location+copy_variation_kernel_name+"_std",
         matrix=copy_number_values_standardised,
-        column_names=cell_line_names,
+        row_names=cell_line_names,
         feature_names=copy_number_names)
     
     
@@ -307,6 +318,8 @@ def constuct_cell_line_kernels():
 DRUG KERNELS
 
 There are 140 drugs.
+After filtering out one drug (84691) whose 1D and 2D descriptors did not 
+process properly in PaDeL, we have 139 drugs left.
 
 We get the following features:
 - PubChem fingerprints
@@ -324,9 +337,85 @@ Drug targets            _                       Jaccard
 Vsurf                   _                       Gaussian
 GRIND/GRIND2            _                       Gaussian
 """
+location_drug_features = "/home/thomas/Dropbox/Biological databases/Sanger_drug_sensivitity/drug_features/"#"/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/drug_features/"
+
+descriptors_1d2d_kernel_name = "1d2d_descriptors"
+targets_kernel_name = "targets"
+pubchem_fp_kernel_name = "PubChem_fingerprints"
+
+
+# Read in the drug_target file and convert it into a binary matrix
+def construct_binary_drug_target_matrix():
+    # Read in the lists of drug targets, tab separated, and the list of PubChem ids
+    pubchem_ids = [pc_id.split("\n")[0] for pc_id in open(location_drug_features+"drug_pubchem_ids").readlines()]
+    targets = [target.split("\n")[0].split("\t") for target in open(location_drug_features+"targets/drug_targets").readlines()]
+    targets = [[target for target in target_list if target != ''] for target_list in targets] #take out the empty targets (target name = '')
+    feature_names = sorted(list(set([x for sublist in targets for x in sublist]))) 
+    
+    # Sort the feature names, and make a binary matrix using that order
+    no_features = len(feature_names)
+    no_drugs = len(pubchem_ids)    
+    binary_matrix = numpy.zeros((no_drugs,no_features))
+    for i,target_list in enumerate(targets):
+        for target in target_list:
+            id_in_matrix = feature_names.index(target)
+            binary_matrix[i,id_in_matrix] = 1
+    
+    # Store the matrix. First row is feature names, first column drug ids.
+    store_features(
+        location=location_drug_features+"targets/drug_targets_binary",
+        matrix=binary_matrix,
+        row_names=pubchem_ids,
+        feature_names=feature_names
+    )
+    
+    
+# Standardise the features for the Gaussian kernel: 1&2D descriptors
+def standardise_features_drugs():
+    location_1d2d_descriptors = location_drug_features+"1d2d/drug_1d2d_filtered.csv"
+    (descriptor_names,drug_ids,values_1d2d) = read_csv_file(location_1d2d_descriptors,"\t")
+    
+    # Check features for constant values across all drugs, and then standardise them
+    (values_1d2d,descriptor_names) = remove_homogenous_features(values_1d2d,descriptor_names)
+    new_values_1d2d = standardise_columns(values_1d2d)
+    
+    store_features(
+        location=location_drug_features+"1d2d/drug_1d2d_filtered_std",
+        matrix=new_values_1d2d,
+        row_names=drug_ids,
+        feature_names=descriptor_names
+    )
+
+
+# Construct the kernels from the features
+def construct_drug_kernels():
+    location_1d2d_descriptors = location_drug_features+"1d2d/drug_1d2d_filtered_std"
+    location_PubChem_fingerprints = location_drug_features+"fingerprints/drug_PubChem_fingerprints_filtered.csv"
+    location_targets = location_drug_features+"targets/drug_targets_binary_filtered"
+    
+    (descriptor_names,drug_ids,values_1d2d) = read_file_with_names(location_1d2d_descriptors)
+    (fingerprint_names,_,values_fingerprints) = read_csv_file(location_PubChem_fingerprints)
+    (target_names,_,values_targets) = read_file_with_names(location_targets)
+    
+    # Also check columns for the same values across all drugs, and remove those
+    (values_1d2d,descriptor_names) = remove_homogenous_features(values_1d2d,descriptor_names)
+    (values_fingerprints,fingerprint_names) = remove_homogenous_features(values_fingerprints,fingerprint_names)
+    (values_targets,target_names) = remove_homogenous_features(values_targets,target_names)
+    
+    # Then construct the kernels
+    descriptors_1d2d_kernel = gaussian_kernel(values_1d2d)  
+    store_kernel(output_kernel_location+descriptors_1d2d_kernel_name,descriptors_1d2d_kernel,drug_ids)
+    
+    fingerprints_kernel = jaccard_kernel(values_fingerprints)  
+    store_kernel(output_kernel_location+pubchem_fp_kernel_name,fingerprints_kernel,drug_ids)
+    
+    targets_kernel = jaccard_kernel(values_targets)  
+    store_kernel(output_kernel_location+targets_kernel_name,targets_kernel,drug_ids)
+    
+
 
 
 if __name__ == "__main__":
-    #constuct_cell_line_kernels()
+    construct_drug_kernels()
     pass
 
