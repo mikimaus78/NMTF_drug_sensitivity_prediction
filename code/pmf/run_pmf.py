@@ -25,7 +25,7 @@ K = 10  ->  0.538111699046
 """
 
 import sys
-sys.path.append("/home/thomas/Documenten/PhD/")#("/home/tab43/Documents/Projects/libraries/")
+sys.path.append("/home/thomas/Documenten/PhD/libraries")#("/home/tab43/Documents/Projects/libraries/")
 import numpy, itertools, matplotlib.pyplot as plt
 from variational_pmf.code.variational_pmf import VariationalPMF
 import ml_helpers.code.mask as mask
@@ -37,7 +37,7 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 standardised = True
 negative = False
 updates = 1
-seed = 0
+seed = 42
 no_folds = 5
 iterations = 100
 K = 10
@@ -52,8 +52,8 @@ def run_cross_validation(X,M,no_folds,K):
     assert_no_empty_rows_columns(Ms)
     
     MSEs = []
-    i_divs = []
-    for fold in range(0,no_folds):
+    #for fold in range(0,no_folds):
+    for fold in [0]:
         print "Fold %s for k=%s." % (fold+1,K)
         M_training = Ms[fold]
         M_test = folds_M[fold]
@@ -98,7 +98,7 @@ def run_PMF(X,M_training,M_test,K):
 
 if __name__ == "__main__":
     """ Load in data. """
-    (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised)
+    (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
     
     if negative:
         data = X

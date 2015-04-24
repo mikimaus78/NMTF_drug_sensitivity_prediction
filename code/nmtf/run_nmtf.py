@@ -55,28 +55,44 @@ S before F and G, Kmeans initialisation (S to all 1's):
 - K=L=5  -> 0.778403335661  0.740796354643  0.707632116702  0.667259433036  0.616872929724  0.59421880759
 - K=L=10 -> 0.836234871516  0.80792697128   0.763092721476  
 
-            1000 iterations 2000 iterations 5000 iterations 10000 iterations
-- K=L=2  ->   
+
+Grid search on standardised Sanger dataset, 1000 iterations:
+    
+        L=1                 L=5                 L=10                L=15                L=20    
+K=1     0.854483256799      
+K=5
+K=10
+K=15
+K=20
+K=25
+K=30
+K=35
+K=40
+K=45
+K=50
 """
 
+# Settings
+standardised = True
+use_kmeans = True
+seed_kmeans = 1
+seed_folds = 42
+S_first = True
+iterations = 1000
+updates = 1
+K = 10
+L = 5
+
+
+
 import sys
-sys.path.append("/home/tab43/Documents/Projects/drug_sensitivity/")
-sys.path.append("/home/tab43/Documents/Projects/libraries/")#("/home/thomas/Documenten/PhD/")
+sys.path.append("/home/thomas/Documenten/PhD/")#("/home/tab43/Documents/Projects/drug_sensitivity/")
+sys.path.append("/home/thomas/Documenten/PhD/libraries/")#("/home/tab43/Documents/Projects/libraries/")
 import numpy, itertools, matplotlib.pyplot as plt
 from nmtf_i_div.code.nmtf import NMTF
 import ml_helpers.code.mask as mask
 import ml_helpers.code.statistics as statistics
 from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
-
-
-# Settings
-standardised = False
-use_kmeans = False
-seed_kmeans = 1
-S_first = True
-iterations = 10
-K = 1
-L = 1
 
 
 # Try each of the values for k in the list <k_values>, and return the performances.
@@ -100,7 +116,8 @@ def run_cross_validation(X,M,no_folds,K,L,seed,iterations,updates):
     
     MSEs = []
     i_divs = []
-    for fold in range(0,no_folds):
+    #for fold in range(0,no_folds):
+    for fold in [0]:
         print "Fold %s for k=%s,l=%s." % (fold+1,K,L)
         M_training = Ms[fold]
         M_test = folds_M[fold]
@@ -142,10 +159,15 @@ def run_NMTF(X,M_training,M_test,K,L,iterations,updates):
     print "Performance on test set: MSE=%s, I-div=%s." % (MSE,i_div)    
     return (MSE,i_div)
 
+
      
 if __name__ == "__main__":
+    # If run from the command line and passed 3 arguments, use those for K, L, iterations  
+    if len(sys.argv) == 3+1: #1st arg is 'run_nmtf.py'
+        (K,L,iterations) = (int(v) for v in sys.argv[1:])
+        
     """ Load in data. """
-    (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised)
+    (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
     
     # We can also treat negative values as missing values. 
     X_filtered = numpy.array([[0 if v < 0 else v for v in row] for row in X])
@@ -153,10 +175,8 @@ if __name__ == "__main__":
     
     """ Run NMTF cross-validation for different K's """
     no_folds = 5
-    seed = 0
-    updates = 1
     
-    (MSEs,i_divs) = run_cross_validation(X_min,M,no_folds,K,L,seed,iterations,updates)
+    (MSEs,i_divs) = run_cross_validation(X_min,M,no_folds,K,L,seed_folds,iterations,updates)
     print sum(MSEs)/float(len(MSEs))
     #print run_cross_validation(X_filtered,M_filtered,no_folds,10,seed,iterations,updates)
     
@@ -165,28 +185,3 @@ if __name__ == "__main__":
     #(MSEs_filtered,i_divs_filtered) = try_different_k(X_filtered,M_filtered,no_folds,K_L_values,seed,iterations,updates)
     #print MSEs,i_divs   
     
-    """
-    Note: MSE and i_div for X_min and X_filtered stay roughly the same for 
-          different values of K (MSE of ~3.15 and ~2.1 resp.).
-    """    
-    
-    '''
-    """ Plot the performances with varying K's """
-    fig = plt.figure(0)
-    plt.plot(K_L_values,MSEs)
-    plt.title("MSE for X_min")
-    
-    fig = plt.figure(1)
-    plt.plot(Ks,i_divs)
-    plt.title("I-div for X_min")
-    
-    fig = plt.figure(2)
-    plt.plot(Ks,MSEs_filtered)
-    plt.title("MSE for X_filtered")
-    
-    fig = plt.figure(3)
-    plt.plot(Ks,i_divs_filtered)
-    plt.title("I-div for X_filtered")
-    
-    plt.show()
-    '''

@@ -33,7 +33,16 @@ def test_sort_matrix_rows():
     expected_new_matrix = numpy.array([[1,3,3,2],[1,2,2,2],[1,1,2,2]])
     new_matrix = construct_kernels.sort_matrix_rows(matrix,names)
     assert numpy.array_equal(expected_new_matrix,new_matrix)
+   
+
+def test_sort_matrix_columns():
+    matrix = numpy.array([[1,2,2,2],[1,1,2,2],[1,3,3,2]])
+    names = ["beta","gamma","theta","alpha"]
     
+    expected_new_matrix = numpy.array([[2,2,2],[1,1,1],[2,1,3],[2,2,3]]).T
+    new_matrix = construct_kernels.sort_matrix_columns(matrix,names)
+    assert numpy.array_equal(expected_new_matrix,new_matrix)
+   
 
 def test_intersection():
     # Test intersection    
@@ -65,6 +74,21 @@ def test_remove_matrix_rows():
     # No rows removed
     names_to_keep = names
     new_matrix = construct_kernels.remove_matrix_rows(matrix,names,names_to_keep)
+    assert numpy.array_equal(matrix,new_matrix)
+
+
+def test_remove_matrix_columns():
+    matrix = numpy.array([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])
+    names = ["3","1","2"]
+    names_to_keep = ["2","3"]
+    
+    expected_matrix = numpy.array([[1,3],[4,6],[7,9],[10,12]])
+    new_matrix = construct_kernels.remove_matrix_columns(matrix,names,names_to_keep)
+    assert numpy.array_equal(expected_matrix,new_matrix)
+    
+    # No rows removed
+    names_to_keep = names
+    new_matrix = construct_kernels.remove_matrix_columns(matrix,names,names_to_keep)
     assert numpy.array_equal(matrix,new_matrix)
 
 

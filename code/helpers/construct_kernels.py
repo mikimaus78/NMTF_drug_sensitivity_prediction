@@ -10,8 +10,10 @@ import numpy, math
 import load_data
 
 output_kernel_location = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/kernels/"#"/home/tab43/Documents/Projects/drug_sensitivity/NMTF_drug_sensitivity_prediction/data/kernels/"
-output_Sanger_location = "/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/"
-name_Sanger_filtered = "ic50_excl_empty_features.txt"
+output_Sanger_location = "/home/thomas/Dropbox/Biological databases/Sanger_drug_sensivitity/"#"/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/"
+
+name_Sanger_filtered_cell_lines = "ic50_excl_empty_filtered_cell_lines.txt"
+name_Sanger_filtered_cell_lines_drugs = "ic50_excl_empty_filtered_cell_lines_drugs.txt"
 
 
 """
@@ -57,6 +59,16 @@ def sort_matrix_rows(matrix,names):
     sorted_names = sorted(names)
     new_matrix = numpy.array([name_to_row[name] for name in sorted_names])
     return new_matrix
+    
+# Method for sorting the matrix columns based on the names (alphabetically).
+def sort_matrix_columns(matrix,names):
+    name_to_column = {}
+    matrix = numpy.array(matrix)
+    for name,column in zip(names,matrix.T):
+        name_to_column[name] = column
+    sorted_names = sorted(names)
+    new_matrix = numpy.array([name_to_column[name] for name in sorted_names]).T
+    return new_matrix
 
 # Method for computing the intersection of two lists
 def intersection(a,b):
@@ -67,6 +79,14 @@ def remove_matrix_rows(matrix,all_names,keep_names):
     # Compute indices of rows to remove
     rows_to_remove = [i for i,name in enumerate(all_names) if name not in keep_names]
     new_matrix = numpy.delete(matrix,rows_to_remove,axis=0)
+    return new_matrix
+    
+# Method for only keeping columns with the specified names
+def remove_matrix_columns(matrix,all_names,keep_names):
+    # Compute indices of columns to remove
+    columns_to_remove = [i for i,name in enumerate(all_names) if name not in keep_names]
+    matrix = numpy.array(matrix)
+    new_matrix = numpy.delete(matrix,columns_to_remove,axis=1)
     return new_matrix
 
 # Method for standardising the columns of a matrix
@@ -135,7 +155,7 @@ def jaccard(a1,a2):
 def gaussian_kernel(values): 
     print "Computing Gaussian kernel..."
     (no_points,no_features) = numpy.array(values).shape
-    sigma_2 = math.sqrt( no_features / 4. ) # The KMF paper used sigma^2 = sqrt(D/4) for D = no. features
+    sigma_2 = no_features / 4. # The KMF paper used sigma^2 = D/4 for D = no. features
     kernel = numpy.zeros((no_points,no_points))
     for i in range(0,no_points):
         print "Data point %s." % i
@@ -156,7 +176,7 @@ def gaussian(a1,a2,sigma_2):
 """
 CELL LINE KERNELS
 
-There are 623 cell lines.
+There are 622 cell lines.
 We get the following features:
 - Gene expression
 - Copy variation
@@ -176,10 +196,10 @@ Gene expression         13321                 Gaussian
 Copy number             426                   Gaussian
 Cancer gene mutations   71                    Jaccard
 """
-location_cell_line_features = "/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/cell_line_features/"
+location_cell_line_features = "/home/thomas/Dropbox/Biological databases/Sanger_drug_sensivitity/cell_line_features/"#"/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/cell_line_features/"
 name_cell_line_features = "en_input_w5.csv"
 
-output_cell_line_features_location = "/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/cell_line_features/"
+output_cell_line_features_location = "/home/thomas/Dropbox/Biological databases/Sanger_drug_sensivitity/cell_line_features/"#"/home/tab43/Dropbox/Biological databases/Sanger_drug_sensivitity/cell_line_features/"
 
 gene_expression_kernel_name = "gene_expression"
 copy_variation_kernel_name = "copy_variation"
@@ -244,7 +264,7 @@ def construct_filtered_feature_matrices_cell_lines():
     
     # Store the new X, as well as the feature matrices
     load_data.store_Sanger(
-        location=output_Sanger_location+name_Sanger_filtered,
+        location=output_Sanger_location+name_Sanger_filtered_cell_lines,
         X=X_filtered,
         M=M_filtered,
         drug_names=Sanger_drug_names,
@@ -318,7 +338,7 @@ def constuct_cell_line_kernels():
 DRUG KERNELS
 
 There are 140 drugs.
-After filtering out one drug (84691) whose 1D and 2D descriptors did not 
+After filtering out one drug (Cisplatin, 84691) whose 1D and 2D descriptors did not 
 process properly in PaDeL, we have 139 drugs left.
 
 We get the following features:
@@ -331,9 +351,9 @@ We get the following features:
 We end up with the following kernels:
 
 Feature type            Number of features      Kernel
-PubChem                 _                       Jaccard
-1&2D descriptors        _                       Gaussian
-Drug targets            _                       Jaccard
+PubChem fingerprints    568                     Jaccard
+1&2D descriptors        854                     Gaussian
+Drug targets            123                     Jaccard
 Vsurf                   _                       Gaussian
 GRIND/GRIND2            _                       Gaussian
 """
@@ -343,6 +363,41 @@ descriptors_1d2d_kernel_name = "1d2d_descriptors"
 targets_kernel_name = "targets"
 pubchem_fp_kernel_name = "PubChem_fingerprints"
 
+# Load in the IC50 dataset (filtered for the cell lines already), filter the 
+# drug Cisplatin (PubChem id 84691), and then reorder the drugs (columns) so 
+# that they are in alphabetical order
+def filter_and_reorder_drugs_Sanger():
+    location_old_Sanger = output_Sanger_location+name_Sanger_filtered_cell_lines
+    location_new_Sanger = output_Sanger_location+name_Sanger_filtered_cell_lines_drugs
+    
+    (X,_,M,Sanger_drug_names,Sanger_cell_lines,Sanger_cancer_types,Sanger_tissues) = load_data.load_Sanger(location_old_Sanger)
+    
+    # First remove the column belonging to drug Cisplatin (id 84691)
+    drug_to_remove = "Cisplatin_IC_50"
+    index_to_remove = list(Sanger_drug_names).index(drug_to_remove)
+    Sanger_drugs_to_keep = numpy.delete(Sanger_drug_names,index_to_remove)
+    
+    X_filtered = remove_matrix_columns(X,Sanger_drug_names,Sanger_drugs_to_keep)
+    M_filtered = remove_matrix_columns(M,Sanger_drug_names,Sanger_drugs_to_keep)
+    
+    # Now sort the columns of X_filtered
+    X_filtered_sorted = sort_matrix_columns(X_filtered,Sanger_drugs_to_keep)
+    M_filtered_sorted = sort_matrix_columns(M_filtered,Sanger_drugs_to_keep)
+    sorted_Sanger_drug_names = sorted(Sanger_drugs_to_keep)  
+    
+    # Take the "_IC_50" bit off all drug names
+    drug_names = [drug_name.split("_IC_50")[0] for drug_name in sorted_Sanger_drug_names]
+    
+    # Finally, store the new dataset
+    load_data.store_Sanger(
+        location=location_new_Sanger,
+        X=X_filtered_sorted,
+        M=M_filtered_sorted,
+        drug_names=drug_names,
+        cell_lines=Sanger_cell_lines,
+        cancer_types=Sanger_cancer_types,
+        tissues=Sanger_tissues)
+        
 
 # Read in the drug_target file and convert it into a binary matrix
 def construct_binary_drug_target_matrix():
@@ -413,9 +468,6 @@ def construct_drug_kernels():
     store_kernel(output_kernel_location+targets_kernel_name,targets_kernel,drug_ids)
     
 
-
-
 if __name__ == "__main__":
     construct_drug_kernels()
-    pass
 

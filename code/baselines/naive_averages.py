@@ -3,17 +3,27 @@ Simply use the row, column, and overall average as the predictions for
 missing values.
 
 Performance: 
-    Row average:        11.2495091576
-    Column average:     3.68292987268
-    Overall average:    11.6507974405
+    Row average:        11.3361332734
+    Column average:     3.59137002826
+    Overall average:    11.6961916386
+    
+Standardised:
+    Row average:        0.859709985449
+    Column average:     1.00370736585
+    Overall average:    1.00003145726
 """
 
 import sys
-sys.path.append("/home/tab43/Documents/Projects/libraries/")#("/home/thomas/Documenten/PhD/")
+sys.path.append("/home/thomas/Documenten/PhD/libraries/")#("/home/tab43/Documents/Projects/libraries/")
 import numpy, itertools
 import ml_helpers.code.mask as mask
 import ml_helpers.code.statistics as statistics
 from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
+
+
+# Settings
+standardised = True
+seed = 42
 
 
 # Method for predicting on all folds. Return a list of MSE's. f is a function
@@ -85,9 +95,8 @@ def f_overall(X,M_training,M_test):
     
     
 if __name__ == "__main__":
-    (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger()
+    (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
     no_folds = 5
-    seed = 0
     
     row_MSEs = run_cross_validation(X,M,no_folds,seed,f_row)
     column_MSEs = run_cross_validation(X,M,no_folds,seed,f_column)

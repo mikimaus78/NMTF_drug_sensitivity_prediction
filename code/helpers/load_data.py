@@ -20,14 +20,18 @@ sys.path.append("/home/thomas/Documenten/PhD/libraries/")
 #sys.path.append("/home/tab43/Documents/Projects/libraries/")
 import ml_helpers.code.mask as mask
 
-#location_Sanger = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensitivity/"
-location_Sanger = "/home/tab43/Documents/Projects/drug_sensitivity/NMTF_drug_sensitivity_prediction/data/Sanger_drug_sensitivity/"
-file_name = "ic50_excl_empty.txt"
-file_name_standardised = "ic50_excl_empty_standardised.txt"
+folder_Sanger = "/home/thomas/Dropbox/Biological databases/Sanger_drug_sensivitity/"
 
-def load_Sanger(standardised=False):
+Sanger_file = folder_Sanger+"ic50_excl_empty_filtered_cell_lines_drugs.txt"
+Sanger_file_std = folder_Sanger+"ic50_excl_empty_filtered_cell_lines_drugs_standardised.txt"
+
+def load_Sanger(location=None,standardised=False):
     """ Load in data. We get a masked array, and set masked values to 0. """
-    fin = location_Sanger + (file_name if not standardised else file_name_standardised)
+    if location:
+        fin = location
+    else:
+        fin = Sanger_file if not standardised else Sanger_file_std
+        
     data = numpy.genfromtxt(fin,dtype=str,delimiter="\t",usemask=True)
     
     drug_names = data[0,3:]
@@ -58,7 +62,21 @@ def store_Sanger(location,X,M,drug_names,cell_lines,cancer_types,tissues):
     
     for i,(cell_line,cancer_type,tissue,row) in enumerate(zip(cell_lines,cancer_types,tissues,X)):
         line = cell_line+"\t"+cancer_type+"\t"+tissue+"\t"
-        data = [str(val) if M[i][j] else ""for (j,val) in enumerate(row)]
+        data = [str(val) if M[i][j] else "" for (j,val) in enumerate(row)]
         line += "\t".join(data) + "\n"
         fout.write(line)
     fout.close()
+
+
+
+def load_kernels(folder,file_names):
+    ''' Load in all the files specified in the list <file_names> in <folder>,
+        and return as a list, along with the drug/cell line names.'''
+    kernels = []
+    for name in file_names:
+        lines = open(folder+name,'r').readlines()
+        #entity_names = lines[0]
+        values = [line.split("\t") for line in lines[1:]]
+        kernel = numpy.array(values,dtype=float)
+        kernels.append(kernel)
+    return kernels
