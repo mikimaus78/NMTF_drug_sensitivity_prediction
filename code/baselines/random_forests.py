@@ -10,21 +10,21 @@ We get three classes of classifiers:
 Performance: 
     Drug:       
     Cell line:  
-    Overall:    
+    Overall:        3.90916816246 (3.9060722858915335 1st fold) (excl gene expression, too big for memory)
     
 Standardised:
     Drug:       
     Cell line:  
-    Overall:    
+    Overall:        1.02499538091 (1.0199794068076518 1st fold) (excl gene expression, too big for memory)
 """
 
 import sys
 sys.path.append("/home/thomas/Documenten/PhD/libraries/")#("/home/tab43/Documents/Projects/libraries/")
 import numpy, itertools
 import ml_helpers.code.mask as mask
-import ml_helpers.code.statistics as statistics
 from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger, load_features
 
+from sklearn.ensemble import RandomForestRegressor
 
 # Settings
 standardised = False
@@ -48,6 +48,7 @@ def run_cross_validation(X,M,drug_features,cell_line_features,no_folds,seed,clas
     
     MSEs = []
     for fold in range(0,no_folds):
+    #for fold in [0]:
         print "Fold %s." % (fold+1)
         M_training = Ms[fold]
         M_test = folds_M[fold]
@@ -88,8 +89,11 @@ def construct_datapoints_overall(X,M,drug_features,cell_line_features):
 
 # Train a RF on the list of data points X and output values Y.
 def train_RF(X_train,Y_train,X_test,Y_test):
-    pass
-    
+    random_forest = RandomForestRegressor(n_estimators=no_trees)
+    random_forest.fit(X_train,Y_train)
+    Y_pred = random_forest.predict(X_test)
+    MSE = sum([ (y_pred - y_test)**2 for (y_pred,y_test) in zip(Y_pred,Y_test)]) / float(len(Y_pred))
+    return MSE
     
     
 if __name__ == "__main__":
@@ -111,11 +115,13 @@ if __name__ == "__main__":
                      load_features(file_fingerprints,delim=','),axis=1),
         load_features(file_targets),axis=1)
         
-    cell_line_features = numpy.append(
-        numpy.append(load_features(file_copy_variation),
-                     load_features(file_gene_expression),axis=1),
-        load_features(file_mutation),axis=1)
+    # Gene expression profile takes up too much memory
+    #cell_line_features = numpy.append(
+    #    numpy.append(load_features(file_copy_variation),
+    #                 load_features(file_gene_expression),axis=1),
+    #    load_features(file_mutation),axis=1)
+    cell_line_features = numpy.append(load_features(file_mutation),load_features(file_mutation),axis=1)
     
     # Run the cross-validation on the data
     overall_MSEs = run_cross_validation(X,M,drug_features,cell_line_features,no_folds,seed,classifier='overall')
-    print "Row average: %s (%s)." % ((sum(overall_MSEs)/float(len(overall_MSEs))),overall_MSEs)
+    print "Overall RF: %s (%s)." % ((sum(overall_MSEs)/float(len(overall_MSEs))),overall_MSEs)
