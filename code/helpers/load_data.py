@@ -68,7 +68,6 @@ def store_Sanger(location,X,M,drug_names,cell_lines,cancer_types,tissues):
     fout.close()
 
 
-
 def load_kernels(folder,file_names):
     ''' Load in all the files specified in the list <file_names> in <folder>,
         and return as a list, along with the drug/cell line names.'''
@@ -80,3 +79,12 @@ def load_kernels(folder,file_names):
         kernel = numpy.array(values,dtype=float)
         kernels.append(kernel)
     return kernels
+    
+    
+def load_features(location,delim="\t"):
+    ''' Load in the features at the specified location, ignoring the first
+        row (column names) and column (row names). '''
+    lines = open(location,'r').readlines()
+    lines = numpy.array([line.split("\n")[0].split(delim) for line in lines[1:]])
+    values = numpy.array(lines[0:,1:],dtype=float)
+    return (values)

@@ -28,12 +28,13 @@ seed_folds = 42
 S_first = True
 iterations = 100
 updates = 1
-K = 5
+K = 10
 L = 5
 
 # Multiply the [0,1] kernels by this to reward/punish clustering more/less
-alpha = 0.01 #622 cell lines, I-div=2200, values are normally ~1 in the kernels
-beta = 0.1 #139 drugs, I-div=2200, values are normally ~1 in the kernels
+# 622 cell lines, 139 drugs, I-div=2200, values are normally ~1 in the kernels
+alpha = 0.01
+beta = 0.1
 
 
 
@@ -124,6 +125,15 @@ if __name__ == "__main__":
     C1 = load_kernels(location_kernels,["copy_variation","gene_expression","mutation"]) #cell lines
     C2 = load_kernels(location_kernels,["1d2d_descriptors","PubChem_fingerprints","targets"]) #drugs
         
+    # Do kernel-1 to give rewards rather than punishments, but ensure the diagonals are still 0's
+    C1 = numpy.subtract(C1,1)
+    C2 = numpy.subtract(C2,1)
+    for c1 in C1:
+        numpy.fill_diagonal(c1,0)
+    for c2 in C2:
+        numpy.fill_diagonal(c2,0)
+    
+    # Multiply the kernels by alpha, beta
     C1 = numpy.multiply(C1,alpha)
     C2 = numpy.multiply(C2,beta)
     

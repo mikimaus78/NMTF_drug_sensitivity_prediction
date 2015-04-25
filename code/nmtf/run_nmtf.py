@@ -56,21 +56,25 @@ S before F and G, Kmeans initialisation (S to all 1's):
 - K=L=10 -> 0.836234871516  0.80792697128   0.763092721476  
 
 
-Grid search on standardised Sanger dataset, 1000 iterations:
+Grid search on standardised Sanger dataset, 1000 iterations (100 iterations for K=1 or L=1):
     
-        L=1                 L=5                 L=10                L=15                L=20    
-K=1     0.854483256799      
-K=5
-K=10
-K=15
-K=20
+        L=1                 L=5                 L=10                L=15                L=20                L=25
+K=1     0.854483256799      0.854483256799      0.854483256799      0.854483256799      0.854483256799      
+K=5     0.854483256799      0.743145734655      0.731950845563      0.733310451325      0.73112745575
+K=10    0.854483256799      0.719186683826*     0.703933196799*     0.709277594836*     0.706172839373*
+K=15    0.854483256799      0.73683041152       0.712197400485      0.714359674189      0.690654537093
+K=20    0.854483256799      0.714004331058      0.719804977301      
 K=25
 K=30
 K=35
 K=40
 K=45
 K=50
+
+K=L=5, 10000 iterations: 0.689958124379
 """
+
+
 
 # Settings
 standardised = True
@@ -162,7 +166,8 @@ def run_NMTF(X,M_training,M_test,K,L,iterations,updates):
 
      
 if __name__ == "__main__":
-    # If run from the command line and passed 3 arguments, use those for K, L, iterations  
+    # If run from the command line and passed 3 arguments, use those for K, L, iterations 
+    #python run_nmtf.py 10 10 1000 | tee ../../logs/output_running_nmtf/10_10_1000.log
     if len(sys.argv) == 3+1: #1st arg is 'run_nmtf.py'
         (K,L,iterations) = (int(v) for v in sys.argv[1:])
         

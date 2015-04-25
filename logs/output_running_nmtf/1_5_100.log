@@ -1,0 +1,116 @@
+Fold 1 for k=1,l=5.
+Initialising F using KMeans.
+Iteration: 1.
+Iteration: 2.
+[622.0]
+Initialising G using KMeans.
+Iteration: 1.
+Iteration: 2.
+Iteration: 3.
+Iteration: 4.
+Iteration: 5.
+Iteration: 6.
+[41.0, 36.0, 7.0, 54.0, 1.0]
+Iteration 0. I-divergence: 812438.758895. MSE: 153.670645311.
+Iteration 1. I-divergence: 3082.96281605. MSE: 1.59959956191.
+Iteration 2. I-divergence: 1714.78277703. MSE: 0.886970211537.
+Iteration 3. I-divergence: 1638.28091804. MSE: 0.846458936534.
+Iteration 4. I-divergence: 1632.15522247. MSE: 0.843178478838.
+Iteration 5. I-divergence: 1631.50904967. MSE: 0.842827604091.
+Iteration 6. I-divergence: 1631.42870185. MSE: 0.842783361936.
+Iteration 7. I-divergence: 1631.41784719. MSE: 0.842777346628.
+Iteration 8. I-divergence: 1631.41632036. MSE: 0.842776518993.
+Iteration 9. I-divergence: 1631.41610117. MSE: 0.842776413096.
+Iteration 10. I-divergence: 1631.41606937. MSE: 0.842776403697.
+Iteration 11. I-divergence: 1631.41606472. MSE: 0.842776404779.
+Iteration 12. I-divergence: 1631.41606404. MSE: 0.842776405899.
+Iteration 13. I-divergence: 1631.41606394. MSE: 0.842776406433.
+Iteration 14. I-divergence: 1631.41606393. MSE: 0.842776406652.
+Iteration 15. I-divergence: 1631.41606393. MSE: 0.842776406737.
+Iteration 16. I-divergence: 1631.41606393. MSE: 0.84277640677.
+Iteration 17. I-divergence: 1631.41606393. MSE: 0.842776406782.
+Iteration 18. I-divergence: 1631.41606393. MSE: 0.842776406787.
+Iteration 19. I-divergence: 1631.41606393. MSE: 0.842776406789.
+Iteration 20. I-divergence: 1631.41606393. MSE: 0.842776406789.
+Iteration 21. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 22. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 23. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 24. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 25. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 26. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 27. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 28. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 29. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 30. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 31. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 32. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 33. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 34. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 35. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 36. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 37. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 38. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 39. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 40. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 41. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 42. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 43. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 44. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 45. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 46. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 47. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 48. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 49. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 50. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 51. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 52. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 53. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 54. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 55. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 56. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 57. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 58. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 59. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 60. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 61. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 62. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 63. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 64. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 65. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 66. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 67. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 68. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 69. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 70. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 71. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 72. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 73. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 74. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 75. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 76. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 77. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 78. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 79. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 80. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 81. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 82. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 83. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 84. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 85. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 86. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 87. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 88. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 89. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 90. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 91. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 92. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 93. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 94. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 95. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 96. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 97. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 98. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 99. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Iteration 100. I-divergence: 1631.41606393. MSE: 0.84277640679.
+Performance on test set: MSE=0.854483256799, I-div=412.444489635.
+0.854483256799

@@ -6,22 +6,21 @@ cross-validation (5 folds).
 Performances
 Non-negative values:
             5 iterations    10 iterations   20 iterations   100 iterations
-K = 1   ->  3.14341020912   3.14237116191   3.14237132098   -
-K = 5   ->  2.90927310451   2.52532203189   2.49676575818   2.40232972398
-K = 10  ->  2.84899158313   2.3464385451    2.27234725768   2.23122158042
-K = 50  ->  3.13621751419   2.4142635075    2.20830485965   2.16682080088
+K = 1   ->  
+K = 5   ->  
+K = 10  ->  
 
 Standardised, non-negative Sanger dataset:
-            5 iterations    10 iterations   20 iterations   100 iterations
-K = 1   ->  0.870348893168  0.870348894795  -               -
-K = 5   ->  0.7936101907    0.621832605327  0.608217217781  0.532586943708
-K = 10  ->  0.808557759748  0.502871452276                  0.472640568664
+            100 iterations
+K = 1   ->  
+K = 5   ->  0.706967309603
+K = 10  ->  
 
 Standardised Sanger dataset:
-            5 iterations    10 iterations   20 iterations   100 iterations
-K = 1   ->  0.836889624042  0.822344257119  -               -
-K = 5   ->  0.648011959179  0.547163374917  0.520122238173  0.520143401769                
-K = 10  ->  0.538111699046  
+            100 iterations  1000 iterations
+K = 1   ->  0.83009897813
+K = 5   ->  0.676651474013  0.676599337456 (converged after ~200 iterations, then RMSE goes up slightly)      
+K = 10  ->  0.713093059595
 """
 
 import sys
@@ -35,11 +34,11 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 
 # Settings
 standardised = True
-negative = False
+negative = True
 updates = 1
 seed = 42
 no_folds = 5
-iterations = 100
+iterations = 1000
 K = 10
 
 
