@@ -31,23 +31,45 @@ def load_Sanger(location=None,standardised=False):
         fin = location
     else:
         fin = Sanger_file if not standardised else Sanger_file_std
-        
+
+    '''        
     data = numpy.genfromtxt(fin,dtype=str,delimiter="\t",usemask=True)
     
     drug_names = data[0,3:]
     cell_lines = data[1:,0]
     cancer_types = data[1:,1]
     tissues = data[1:,2]
-    
+
     X = data[1:,3:] #numpy.array(data[1:,3:],dtype='f')
     M = mask.calc_inverse_M(numpy.array(X.mask,dtype=float))
     (I,J) = X.shape # 2200 drugs, 60 cancer cell lines
+    '''
+    lines = [line.split("\n")[0].split("\t") for line in open(fin,'r').readlines()]
+    drug_names = lines[0][3:]
+    cell_lines = []
+    cancer_types = []
+    tissues = []
+    X = []
+    M = []
+    for line in lines[1:]:
+        cell_lines.append(line[0])
+        cancer_types.append(line[1])
+        tissues.append(line[2])
+        X.append([float(v) if v != '' else 0.0 for v in line[3:]])
+        M.append([1.0 if v != '' else 0.0 for v in line[3:]])
+    X = numpy.array(X,dtype=float)
+    M = numpy.array(M,dtype=float)
     
     """ For missing values we place 0. Our method requires non-negative values so we transform the values.
         Exponential transform gives horrible performance, so we simply subtract the min from all values. """
-    X = numpy.array([[v if v else '0' for v in row] for row in X],dtype=float) #set missing values to 0
+    #X = numpy.array([[v if v else '0' for v in row] for row in X],dtype=float) #set missing values to 0
     minimum = X.min()-1
-    X_min = numpy.array([[v-minimum if v else '0' for v in row] for row in X],dtype=float)
+    #X_min = numpy.array([[v-minimum if v else '0' for v in row] for row in X],dtype=float)
+    
+    X_min = []
+    for row,row_M in zip(X,M):    
+        X_min.append([v-minimum if m else 0.0 for v,m in zip(row,row_M)])
+    X_min = numpy.array(X_min,dtype=float)
     
     return (X,X_min,M,drug_names,cell_lines,cancer_types,tissues)
     

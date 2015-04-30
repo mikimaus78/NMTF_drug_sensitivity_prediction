@@ -27,7 +27,7 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger,
 from sklearn.ensemble import RandomForestRegressor
 
 # Settings
-standardised = False
+standardised = True
 seed = 42
 no_trees = 10
 
@@ -91,6 +91,10 @@ def construct_datapoints_overall(X,M,drug_features,cell_line_features):
 def train_RF(X_train,Y_train,X_test,Y_test):
     random_forest = RandomForestRegressor(n_estimators=no_trees)
     random_forest.fit(X_train,Y_train)
+    
+    Y_fit = random_forest.predict(X_train)
+    print sum([ (y_fit - y_train)**2 for (y_fit,y_train) in zip(Y_fit,Y_train)]) / float(len(Y_fit))
+    
     Y_pred = random_forest.predict(X_test)
     MSE = sum([ (y_pred - y_test)**2 for (y_pred,y_test) in zip(Y_pred,Y_test)]) / float(len(Y_pred))
     return MSE
