@@ -15,22 +15,21 @@ Standardised:
 
 import sys
 sys.path.append("/home/thomas/Documenten/PhD/libraries/")#("/home/tab43/Documents/Projects/libraries/")
-import numpy, itertools
+import numpy, itertools, random
 import ml_helpers.code.mask as mask
 import ml_helpers.code.statistics as statistics
 from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 
 
 # Settings
-standardised = True
-seed = 42
+standardised = False
 
 
 # Method for predicting on all folds. Return a list of MSE's. f is a function
 # that runs the predictor (row/column/overall average) on the fold.
-def run_cross_validation(X,M,no_folds,seed,f):
+def run_cross_validation(X,M,no_folds,f):
     (I,J) = M.shape
-    folds_M = mask.compute_folds(I,J,no_folds,seed,M)
+    folds_M = mask.compute_folds(I,J,no_folds,M)
     Ms = mask.compute_Ms(folds_M)
     assert_no_empty_rows_columns(Ms)
     
@@ -95,12 +94,14 @@ def f_overall(X,M_training,M_test):
     
     
 if __name__ == "__main__":
+    random.seed(0)    
+    
     (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
     no_folds = 5
     
-    row_MSEs = run_cross_validation(X,M,no_folds,seed,f_row)
-    column_MSEs = run_cross_validation(X,M,no_folds,seed,f_column)
-    overall_MSEs = run_cross_validation(X,M,no_folds,seed,f_overall)
+    row_MSEs = run_cross_validation(X,M,no_folds,f_row)
+    column_MSEs = run_cross_validation(X,M,no_folds,f_column)
+    overall_MSEs = run_cross_validation(X,M,no_folds,f_overall)
     
     print "Row average: %s." % (sum(row_MSEs)/float(len(row_MSEs)))
     print "Column average: %s." % (sum(column_MSEs)/float(len(column_MSEs)))

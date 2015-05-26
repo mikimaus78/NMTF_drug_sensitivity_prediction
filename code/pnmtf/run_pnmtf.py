@@ -23,8 +23,6 @@ Observations:
 # Settings
 standardised = True
 use_kmeans = True
-seed_kmeans = 1
-seed_folds = 42
 S_first = True
 iterations = 100
 updates = 1
@@ -41,7 +39,7 @@ beta = 0.1
 import sys
 sys.path.append("/home/thomas/Documenten/PhD/")#("/home/tab43/Documents/Projects/drug_sensitivity/")
 sys.path.append("/home/thomas/Documenten/PhD/libraries/")#("/home/tab43/Documents/Projects/libraries/")
-import numpy, itertools
+import numpy, itertools, random
 from pnmtf_i_div.code.pnmtf import PNMTF
 import ml_helpers.code.mask as mask
 import ml_helpers.code.statistics as statistics
@@ -50,21 +48,21 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger,
 
 
 # Try each of the values for k in the list <k_values>, and return the performances.
-def try_different_k(X,M,no_folds,K_L_values,C1,C2,seed,iterations,updates):
+def try_different_k(X,M,no_folds,K_L_values,C1,C2,iterations,updates):
     mean_MSEs = []
     mean_i_divs = []
     for K,L in K_L_values:
         print "Running cross-validation with value K=%s, L=%s." % (K,L)
-        MSEs,i_divs = run_cross_validation(X,M,no_folds,K,L,C1,C2,seed,iterations,updates)
+        MSEs,i_divs = run_cross_validation(X,M,no_folds,K,L,C1,C2,iterations,updates)
         mean_MSEs.append(sum(MSEs) / float(len(MSEs)))
         mean_i_divs.append(sum(i_divs) / float(len(i_divs)))
         
     return (mean_MSEs,mean_i_divs)
     
 # Run NMTF on different folds    
-def run_cross_validation(X,M,no_folds,K,L,C1,C2,seed,iterations,updates):
+def run_cross_validation(X,M,no_folds,K,L,C1,C2,iterations,updates):
     (I,J) = M.shape
-    folds_M = mask.compute_folds(I,J,no_folds,seed,M)
+    folds_M = mask.compute_folds(I,J,no_folds,M)
     Ms = mask.compute_Ms(folds_M)
     assert_no_empty_rows_columns(Ms)
     
@@ -102,7 +100,7 @@ def assert_no_empty_rows_columns(Ms):
 # Run NMTF on the training data X, with known values <M_training> and test entries <M_test>.
 def run_NMTF(X,M_training,M_test,K,L,C1,C2,iterations,updates):
     nmtf = PNMTF(X,M_training,K,L,C1,C2)
-    nmtf.initialise(use_kmeans,seed_kmeans)
+    nmtf.initialise(use_kmeans)
     nmtf.run(iterations,updates,S_first)
     X_pred = nmtf.R_pred
     
@@ -119,6 +117,8 @@ location_kernels = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction
 
      
 if __name__ == "__main__":
+    random.seed(0)    
+    
     """ Load in data. """
     (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
     
@@ -144,5 +144,5 @@ if __name__ == "__main__":
     """ Run NMTF cross-validation for different K's, L's """
     no_folds = 5
     
-    (MSEs,i_divs) = run_cross_validation(X_min,M,no_folds,K,L,C1,C2,seed_folds,iterations,updates)
+    (MSEs,i_divs) = run_cross_validation(X_min,M,no_folds,K,L,C1,C2,iterations,updates)
     print sum(MSEs)/float(len(MSEs))

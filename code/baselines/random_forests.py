@@ -20,15 +20,14 @@ Standardised:
 
 import sys
 sys.path.append("/home/thomas/Documenten/PhD/libraries/")#("/home/tab43/Documents/Projects/libraries/")
-import numpy, itertools
+import numpy, itertools, random
 import ml_helpers.code.mask as mask
 from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger, load_features
 
 from sklearn.ensemble import RandomForestRegressor
 
 # Settings
-standardised = True
-seed = 42
+standardised = False
 no_trees = 10
 
 location_features = '/home/thomas/Dropbox/Biological databases/Sanger_drug_sensivitity/'
@@ -40,9 +39,9 @@ location_features = '/home/thomas/Dropbox/Biological databases/Sanger_drug_sensi
 #   train a classifier per column (on cell line features)       classifier='column'
 #   train one classifier overall (on drug+cell line features)   classifier='overall'
 
-def run_cross_validation(X,M,drug_features,cell_line_features,no_folds,seed,classifier='overall'):
+def run_cross_validation(X,M,drug_features,cell_line_features,no_folds,classifier='overall'):
     (I,J) = M.shape
-    folds_M = mask.compute_folds(I,J,no_folds,seed,M)
+    folds_M = mask.compute_folds(I,J,no_folds,M)
     Ms = mask.compute_Ms(folds_M)
     assert_no_empty_rows_columns(Ms)
     
@@ -101,6 +100,8 @@ def train_RF(X_train,Y_train,X_test,Y_test):
     
     
 if __name__ == "__main__":
+    random.seed(0)    
+    
     # Load in the Sanger dataset
     (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
     no_folds = 5
@@ -127,5 +128,5 @@ if __name__ == "__main__":
     cell_line_features = numpy.append(load_features(file_mutation),load_features(file_mutation),axis=1)
     
     # Run the cross-validation on the data
-    overall_MSEs = run_cross_validation(X,M,drug_features,cell_line_features,no_folds,seed,classifier='overall')
+    overall_MSEs = run_cross_validation(X,M,drug_features,cell_line_features,no_folds,classifier='overall')
     print "Overall RF: %s (%s)." % ((sum(overall_MSEs)/float(len(overall_MSEs))),overall_MSEs)

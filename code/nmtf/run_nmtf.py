@@ -59,11 +59,11 @@ S before F and G, Kmeans initialisation (S to all 1's):
 Grid search on standardised Sanger dataset, 1000 iterations (100 iterations for K=1 or L=1):
     
         L=1                 L=5                 L=10                L=15                L=20                L=25
-K=1     0.854483256799      0.854483256799      0.854483256799      0.854483256799      0.854483256799      
-K=5     0.854483256799      0.743145734655      0.731950845563      0.733310451325      0.73112745575
-K=10    0.854483256799      0.719186683826*     0.703933196799*     0.709277594836*     0.706172839373*
-K=15    0.854483256799      0.73683041152       0.712197400485      0.714359674189      0.690654537093
-K=20    0.854483256799      0.714004331058      0.719804977301      
+K=1          
+K=5     
+K=10    
+K=15    
+K=20         
 K=25
 K=30
 K=35
@@ -79,20 +79,18 @@ K=L=5, 10000 iterations: 0.689958124379
 # Settings
 standardised = True
 use_kmeans = True
-seed_kmeans = 1
-seed_folds = 42
 S_first = True
-iterations = 1000
+iterations = 10000
 updates = 1
-K = 10
-L = 5
+K = 50
+L = 20
 
 
 
 import sys
 sys.path.append("/home/thomas/Documenten/PhD/")#("/home/tab43/Documents/Projects/drug_sensitivity/")
 sys.path.append("/home/thomas/Documenten/PhD/libraries/")#("/home/tab43/Documents/Projects/libraries/")
-import numpy, itertools, matplotlib.pyplot as plt
+import numpy, itertools, random
 from nmtf_i_div.code.nmtf import NMTF
 import ml_helpers.code.mask as mask
 import ml_helpers.code.statistics as statistics
@@ -100,21 +98,21 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 
 
 # Try each of the values for k in the list <k_values>, and return the performances.
-def try_different_k(X,M,no_folds,K_L_values,seed,iterations,updates):
+def try_different_k(X,M,no_folds,K_L_values,iterations,updates):
     mean_MSEs = []
     mean_i_divs = []
     for K,L in K_L_values:
         print "Running cross-validation with value K=%s, L=%s." % (K,L)
-        MSEs,i_divs = run_cross_validation(X,M,no_folds,K,L,seed,iterations,updates)
+        MSEs,i_divs = run_cross_validation(X,M,no_folds,K,L,iterations,updates)
         mean_MSEs.append(sum(MSEs) / float(len(MSEs)))
         mean_i_divs.append(sum(i_divs) / float(len(i_divs)))
         
     return (mean_MSEs,mean_i_divs)
     
 # Run NMTF on different folds    
-def run_cross_validation(X,M,no_folds,K,L,seed,iterations,updates):
+def run_cross_validation(X,M,no_folds,K,L,iterations,updates):
     (I,J) = M.shape
-    folds_M = mask.compute_folds(I,J,no_folds,seed,M)
+    folds_M = mask.compute_folds(I,J,no_folds,M)
     Ms = mask.compute_Ms(folds_M)
     assert_no_empty_rows_columns(Ms)
     
@@ -152,8 +150,8 @@ def assert_no_empty_rows_columns(Ms):
 # Run NMTF on the training data X, with known values <M_training> and test entries <M_test>.
 def run_NMTF(X,M_training,M_test,K,L,iterations,updates):
     nmtf = NMTF(X,M_training,K,L)
-    nmtf.initialise(use_kmeans,seed_kmeans)
-    nmtf.run(iterations,updates,S_first)
+    nmtf.initialise(use_kmeans)
+    nmtf.run(iterations,updates,0,S_first,M_test)
     X_pred = nmtf.R_pred
     
     # Calculate MSE of predictions.
@@ -166,6 +164,8 @@ def run_NMTF(X,M_training,M_test,K,L,iterations,updates):
 
      
 if __name__ == "__main__":
+    random.seed(0)    
+        
     # If run from the command line and passed 3 arguments, use those for K, L, iterations 
     #python run_nmtf.py 10 10 1000 | tee ../../logs/output_running_nmtf/10_10_1000.log
     if len(sys.argv) == 3+1: #1st arg is 'run_nmtf.py'
@@ -181,12 +181,12 @@ if __name__ == "__main__":
     """ Run NMTF cross-validation for different K's """
     no_folds = 5
     
-    (MSEs,i_divs) = run_cross_validation(X_min,M,no_folds,K,L,seed_folds,iterations,updates)
+    (MSEs,i_divs) = run_cross_validation(X_min,M,no_folds,K,L,iterations,updates)
     print sum(MSEs)/float(len(MSEs))
-    #print run_cross_validation(X_filtered,M_filtered,no_folds,10,seed,iterations,updates)
+    #print run_cross_validation(X_filtered,M_filtered,no_folds,10,iterations,updates)
     
     #K_L_values = itertools.product(range(1,2+1),range(1,2+1))
-    #(MSEs,i_divs) = try_different_k(X_min,M,no_folds,K_L_values,seed,iterations,updates)
-    #(MSEs_filtered,i_divs_filtered) = try_different_k(X_filtered,M_filtered,no_folds,K_L_values,seed,iterations,updates)
+    #(MSEs,i_divs) = try_different_k(X_min,M,no_folds,K_L_values,iterations,updates)
+    #(MSEs_filtered,i_divs_filtered) = try_different_k(X_filtered,M_filtered,no_folds,K_L_values,iterations,updates)
     #print MSEs,i_divs   
     
