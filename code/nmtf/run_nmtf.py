@@ -23,14 +23,16 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 # Settings
 standardised = False
 
-K = 20#50
-L = 5#20
+K = 20#50#
+L = 5#20#
 
 max_iterations = 10000
 updates = 1
 epsilon_stop = 0.00001
 Kmeans = True
+S_random = True
 S_first = True
+Rpred_Skl = False
 
 random.seed(0)   
 
@@ -49,8 +51,10 @@ nmtf.train(
     updates=updates,
     epsilon_stop=epsilon_stop,
     Kmeans=Kmeans,
+    S_random=S_random,
     S_first=S_first,
-    M_test=None
+    M_test=None,
+    Rpred_Skl=Rpred_Skl
 )
 F = nmtf.F
 S = nmtf.S

@@ -22,10 +22,12 @@ standardised = False
 train_config = {
     'max_iterations' : 10000,
     'updates' : 1,
-    'epsilon_stop' : 0.00001,
+    'epsilon_stop' : 0.00001, #0.0001?
     'Kmeans' : True,
+    'S_random' : True,
     'S_first' : True,
-    'M_test' : None
+    'M_test' : None,
+    'Rpred_Skl' : False
 }
 K_range = [10,20,30,40,50,60,70,80]#[5,10,15,20,25,30,35,40,45,50]
 L_range = [5,10,15,20,25,30]#[5,10,15,20,25]

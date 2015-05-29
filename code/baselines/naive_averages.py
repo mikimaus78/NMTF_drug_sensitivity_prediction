@@ -3,14 +3,21 @@ Simply use the row, column, and overall average as the predictions for
 missing values.
 
 Performance: 
-    Row average:        11.3361332734
-    Column average:     3.59137002826
-    Overall average:    11.6961916386
+    Row average: 
+        {'R^2': 0.029644933669548325,   'MSE': 11.348631455868887,  'Rp': 0.17923432717792037}.
+    Column average: 
+        {'R^2': 0.6924921858635702,     'MSE': 3.5957738645991015,  'Rp': 0.83221287015222334}.
+    Overall average: 
+        {'R^2': -7.272791048196225e-05, 'MSE': 11.696021184479459,  'Rp': -1.4527554718208073e-17}.
     
 Standardised:
-    Row average:        0.859709985449
-    Column average:     1.00370736585
-    Overall average:    1.00003145726
+    Row average: 
+        {'R^2': 0.13962335040720558,    'MSE': 0.86040636569319207, 'Rp': 0.37456165576957895}.
+    Column average: 
+        {'R^2': -0.004933197333114059,  'MSE': 1.0048378932278417,  'Rp': -0.091742344925145242}.
+    Overall average: 
+        {'R^2': -0.0004141644759969143, 'MSE': 1.0001484747287068,  'Rp': -3.6538130267781734e-18}.
+
 """
 
 import sys
@@ -22,7 +29,7 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 
 
 # Settings
-standardised = True
+standardised = False
 
 
 # Method for predicting on all folds. Return a list of MSE's. f is a function
@@ -33,17 +40,17 @@ def run_cross_validation(X,M,no_folds,f):
     Ms = mask.compute_Ms(folds_M)
     assert_no_empty_rows_columns(Ms)
     
-    MSEs = []
+    performances = []
     for fold in range(0,no_folds):
         print "Fold %s." % (fold+1)
         M_training = Ms[fold]
         M_test = folds_M[fold]
         assert numpy.array_equal(M_training+M_test, M)
         
-        MSE = f(X,M_training,M_test)
-        MSEs.append(MSE)
+        performance = f(X,M_training,M_test)
+        performances.append(performance)
         
-    return MSEs
+    return performances
     
 # Test the folds to ensure none has an entirely empty row or column.
 def assert_no_empty_rows_columns(Ms):
@@ -69,18 +76,24 @@ def f_row(X,M_training,M_test):
     averages = [sum([X[i][j] for j in omega_I[i]])/float(len(omega_I[i])) for i in range(0,I)]
     
     X_pred = numpy.array([[averages[i] for j in range(0,J)] for i in range(0,I)])
+    
     MSE = statistics.MSE(X,X_pred,M_test)
-    return MSE
+    R2 = statistics.R2(X,X_pred,M_test)
+    Rp = statistics.Rp(X,X_pred,M_test)
+    return {'MSE':MSE,'R^2':R2,'Rp':Rp}
 
 def f_column(X,M_training,M_test):
     # Compute the row averages of M_training
     (I,J) = M_training.shape
     omega_J = mask.nonzero_column_indices(M_training)
     averages = [sum([X[i][j] for i in omega_J[j]])/float(len(omega_J[j])) for j in range(0,J)]
-                
+    
     X_pred = numpy.array([[averages[j] for j in range(0,J)] for i in range(0,I)])
+    
     MSE = statistics.MSE(X,X_pred,M_test)
-    return MSE
+    R2 = statistics.R2(X,X_pred,M_test)
+    Rp = statistics.Rp(X,X_pred,M_test)
+    return {'MSE':MSE,'R^2':R2,'Rp':Rp}
     
 def f_overall(X,M_training,M_test):
     # Compute the row averages of M_training
@@ -89,20 +102,41 @@ def f_overall(X,M_training,M_test):
     average = sum([X[i][j] for (i,j) in omega])/len(omega)
                 
     X_pred = numpy.array([[average for j in range(0,J)] for i in range(0,I)])
+    
     MSE = statistics.MSE(X,X_pred,M_test)
-    return MSE
+    R2 = statistics.R2(X,X_pred,M_test)
+    Rp = statistics.Rp(X,X_pred,M_test)
+    return {'MSE':MSE,'R^2':R2,'Rp':Rp}
     
     
-if __name__ == "__main__":
-    random.seed(0)    
-    
-    (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
-    no_folds = 5
-    
-    row_MSEs = run_cross_validation(X,M,no_folds,f_row)
-    column_MSEs = run_cross_validation(X,M,no_folds,f_column)
-    overall_MSEs = run_cross_validation(X,M,no_folds,f_overall)
-    
-    print "Row average: %s." % (sum(row_MSEs)/float(len(row_MSEs)))
-    print "Column average: %s." % (sum(column_MSEs)/float(len(column_MSEs)))
-    print "Overall average: %s." % (sum(overall_MSEs)/float(len(overall_MSEs)))
+# Run the cross-validation
+random.seed(0)    
+
+(X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
+no_folds = 5
+
+row_performances = run_cross_validation(X,M,no_folds,f_row)
+column_performances = run_cross_validation(X,M,no_folds,f_column)
+overall_performances = run_cross_validation(X,M,no_folds,f_overall)
+
+# Find average performances
+def find_averages(performances):
+    averages = {'MSE':0.0,'R^2':0.0,'Rp':0.0}
+    n = float(len(performances))
+    for performance in performances:
+        for name in performance:
+            averages[name] += performance[name]
+    for name,value in averages.iteritems():
+        averages[name] /= n
+    return averages
+            
+row_averages = find_averages(row_performances)
+column_averages = find_averages(column_performances)
+overall_averages = find_averages(overall_performances)
+
+print "Row performances: %s." % (row_performances)
+print "Row average: %s." % (row_averages)
+print "Column performances: %s." % (column_performances)
+print "Column average: %s." % (column_averages)
+print "Overall performances: %s." % (overall_performances)
+print "Overall average: %s." % (overall_averages)
