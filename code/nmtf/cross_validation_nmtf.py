@@ -1,6 +1,9 @@
 """
 Run the cross-validation parameter search for the NMTF class, on the Sanger
 dataset.
+
+Since we want to find co-clusters of significantly higher/lower drug sensitivity
+values, we should use the unstandardised Sanger dataset.
 """
 
 import sys
@@ -15,7 +18,7 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 
 
 # Settings
-standardised = True
+standardised = False
 train_config = {
     'max_iterations' : 10000,
     'updates' : 1,
@@ -27,7 +30,7 @@ train_config = {
 K_range = [10,20,30,40,50,60,70,80]#[5,10,15,20,25,30,35,40,45,50]
 L_range = [5,10,15,20,25,30]#[5,10,15,20,25]
 no_folds = 5
-output_file = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/results/crossval_nmtf.txt"
+output_file = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/results/crossval_nmtf_%s.txt" % ("std" if standardised else "notstd")
 
 # Construct the parameter search
 parameter_search = [{'K':K,'L':L} for (K,L) in itertools.product(K_range,L_range)]

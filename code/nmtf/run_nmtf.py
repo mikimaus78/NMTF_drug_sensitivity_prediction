@@ -1,6 +1,15 @@
 """
 Run the NMTF algorithm on the full Sanger dataset.
 Then output the matrices F, S, G, and predictions R_pred.
+
+Findings:
+- S=1 converges slower than S=[0,1] randomly (similar for low K,L, slower for high)
+  Especially so for the non-standardised dataset!
+- Furthermore, for S=1 F,S,G are all roughly the same values; for S=[0,1] we
+  get more differing values (more interpretation?)
+- Kmeans initialisation (either with S=1 or S=[0,1]) gives very bad convergence
+- Updating R_pred once per iteration rather than for each S_kl gives very
+  similar performance and is much faster
 """
 import sys
 sys.path.append("/home/thomas/Documenten/PhD/")#("/home/tab43/Documents/Projects/drug_sensitivity/")
@@ -12,10 +21,10 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 
 
 # Settings
-standardised = True
+standardised = False
 
-K = 50
-L = 20
+K = 20#50
+L = 5#20
 
 max_iterations = 10000
 updates = 1

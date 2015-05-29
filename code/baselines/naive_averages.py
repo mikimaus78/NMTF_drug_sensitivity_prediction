@@ -22,7 +22,7 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 
 
 # Settings
-standardised = False
+standardised = True
 
 
 # Method for predicting on all folds. Return a list of MSE's. f is a function
