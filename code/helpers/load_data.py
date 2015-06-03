@@ -13,6 +13,9 @@ Returns:
     tissues         List of tissue types of the cell lines
     
 Also have a helper for storing it back into a file.
+
+The original file ic50.txt has 707 cancer cell lines, 140 drugs, and 
+80.7264093756% of the values are known.
 """
 
 import numpy, sys
@@ -44,7 +47,7 @@ def load_Sanger(location=None,standardised=False):
     M = mask.calc_inverse_M(numpy.array(X.mask,dtype=float))
     (I,J) = X.shape # 2200 drugs, 60 cancer cell lines
     '''
-    lines = [line.split("\n")[0].split("\t") for line in open(fin,'r').readlines()]
+    lines = [line.split("\n")[0].split("\r")[0].split("\t") for line in open(fin,'r').readlines()]
     drug_names = lines[0][3:]
     cell_lines = []
     cancer_types = []
@@ -110,3 +113,8 @@ def load_features(location,delim="\t"):
     lines = numpy.array([line.split("\n")[0].split(delim) for line in lines[1:]])
     values = numpy.array(lines[0:,1:],dtype=float)
     return (values)
+
+(X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(Sanger_file_std)#folder_Sanger+"ic50.txt")
+(I,J)= X.shape
+print I,J
+print I*J, M.sum(), M.sum()/(I*J)

@@ -77,9 +77,9 @@ def f_row(X,M_training,M_test):
     
     X_pred = numpy.array([[averages[i] for j in range(0,J)] for i in range(0,I)])
     
-    MSE = statistics.MSE(X,X_pred,M_test)
-    R2 = statistics.R2(X,X_pred,M_test)
-    Rp = statistics.Rp(X,X_pred,M_test)
+    MSE = statistics.MSE_matrix(X,X_pred,M_test)
+    R2 = statistics.R2_matrix(X,X_pred,M_test)
+    Rp = statistics.Rp_matrix(X,X_pred,M_test)
     return {'MSE':MSE,'R^2':R2,'Rp':Rp}
 
 def f_column(X,M_training,M_test):
@@ -90,9 +90,9 @@ def f_column(X,M_training,M_test):
     
     X_pred = numpy.array([[averages[j] for j in range(0,J)] for i in range(0,I)])
     
-    MSE = statistics.MSE(X,X_pred,M_test)
-    R2 = statistics.R2(X,X_pred,M_test)
-    Rp = statistics.Rp(X,X_pred,M_test)
+    MSE = statistics.MSE_matrix(X,X_pred,M_test)
+    R2 = statistics.R2_matrix(X,X_pred,M_test)
+    Rp = statistics.Rp_matrix(X,X_pred,M_test)
     return {'MSE':MSE,'R^2':R2,'Rp':Rp}
     
 def f_overall(X,M_training,M_test):
@@ -103,40 +103,41 @@ def f_overall(X,M_training,M_test):
                 
     X_pred = numpy.array([[average for j in range(0,J)] for i in range(0,I)])
     
-    MSE = statistics.MSE(X,X_pred,M_test)
-    R2 = statistics.R2(X,X_pred,M_test)
-    Rp = statistics.Rp(X,X_pred,M_test)
+    MSE = statistics.MSE_matrix(X,X_pred,M_test)
+    R2 = statistics.R2_matrix(X,X_pred,M_test)
+    Rp = statistics.Rp_matrix(X,X_pred,M_test)
     return {'MSE':MSE,'R^2':R2,'Rp':Rp}
     
     
 # Run the cross-validation
-random.seed(0)    
-
-(X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
-no_folds = 5
-
-row_performances = run_cross_validation(X,M,no_folds,f_row)
-column_performances = run_cross_validation(X,M,no_folds,f_column)
-overall_performances = run_cross_validation(X,M,no_folds,f_overall)
-
-# Find average performances
-def find_averages(performances):
-    averages = {'MSE':0.0,'R^2':0.0,'Rp':0.0}
-    n = float(len(performances))
-    for performance in performances:
-        for name in performance:
-            averages[name] += performance[name]
-    for name,value in averages.iteritems():
-        averages[name] /= n
-    return averages
-            
-row_averages = find_averages(row_performances)
-column_averages = find_averages(column_performances)
-overall_averages = find_averages(overall_performances)
-
-print "Row performances: %s." % (row_performances)
-print "Row average: %s." % (row_averages)
-print "Column performances: %s." % (column_performances)
-print "Column average: %s." % (column_averages)
-print "Overall performances: %s." % (overall_performances)
-print "Overall average: %s." % (overall_averages)
+if __name__ == "__main__":
+    random.seed(0)    
+    
+    (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
+    no_folds = 5
+    
+    row_performances = run_cross_validation(X,M,no_folds,f_row)
+    column_performances = run_cross_validation(X,M,no_folds,f_column)
+    overall_performances = run_cross_validation(X,M,no_folds,f_overall)
+    
+    # Find average performances
+    def find_averages(performances):
+        averages = {'MSE':0.0,'R^2':0.0,'Rp':0.0}
+        n = float(len(performances))
+        for performance in performances:
+            for name in performance:
+                averages[name] += performance[name]
+        for name,value in averages.iteritems():
+            averages[name] /= n
+        return averages
+                
+    row_averages = find_averages(row_performances)
+    column_averages = find_averages(column_performances)
+    overall_averages = find_averages(overall_performances)
+    
+    print "Row performances: %s." % (row_performances)
+    print "Row average: %s." % (row_averages)
+    print "Column performances: %s." % (column_performances)
+    print "Column average: %s." % (column_averages)
+    print "Overall performances: %s." % (overall_performances)
+    print "Overall average: %s." % (overall_averages)

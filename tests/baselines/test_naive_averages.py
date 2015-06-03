@@ -44,9 +44,13 @@ def test_f_row():
     M_training = numpy.array([[1,1,1,0],[0,0,1,1],[0,1,1,0]])
     M_test = numpy.array([[0,0,0,1],[0,1,0,0],[1,0,0,1]])
     # Row averages: [2.0,7.5,10.5]
-    expected_MSE = (2.**2 + 1.5**2 + 1.5**2 + 1.5**2) / 4.
-    MSE = naive_averages.f_row(X,M_training,M_test)
-    assert expected_MSE == MSE
+    expected_performances = {
+        'MSE' : (2.**2 + 1.5**2 + 1.5**2 + 1.5**2) / 4.,
+        'R^2' : 0.7074829931972789, 
+        'Rp' : 0.88220718990898173
+    }
+    performances = naive_averages.f_row(X,M_training,M_test)
+    assert expected_performances == performances
     
     
 def test_f_column():
@@ -54,9 +58,13 @@ def test_f_column():
     M_training = numpy.array([[1,1,1,0],[0,0,1,1],[0,1,1,0]])
     M_test = numpy.array([[0,0,0,1],[0,1,0,0],[1,0,0,1]])
     # Column averages: [1.0,6.0,7.0,8.0]
-    expected_MSE = (4.**2 + 0.**2 + 8.**2 + 4.**2) / 4.
-    MSE = naive_averages.f_column(X,M_training,M_test)
-    assert expected_MSE == MSE
+    expected_performances = {
+        'MSE' : (4.**2 + 0.**2 + 8.**2 + 4.**2) / 4.,
+        'R^2' : -1.6122448979591835, 
+        'Rp' : -0.15132998169159548
+    }
+    performances = naive_averages.f_column(X,M_training,M_test)
+    assert expected_performances == performances
     
    
 def test_f_overall():
@@ -64,6 +72,10 @@ def test_f_overall():
     M_training = numpy.array([[1,1,1,0],[0,0,1,1],[0,1,1,0]])
     M_test = numpy.array([[0,0,0,1],[0,1,0,0],[1,0,0,1]])
     # Overall average: 6.0
-    expected_MSE = (2.**2 + 0.**2 + 3.**2 + 6.**2) / 4.
-    MSE = naive_averages.f_overall(X,M_training,M_test)
-    assert expected_MSE == MSE
+    expected_performances = {
+        'MSE' : (2.**2 + 0.**2 + 3.**2 + 6.**2) / 4.,
+        'R^2' : -0.33333333333333326, 
+        'Rp' : 0.0
+    }
+    performances = naive_averages.f_overall(X,M_training,M_test)
+    assert expected_performances == performances

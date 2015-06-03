@@ -22,7 +22,7 @@ standardised = False
 train_config = {
     'max_iterations' : 10000,
     'updates' : 1,
-    'epsilon_stop' : 0.00001, #0.0001?
+    'epsilon_stop' : 0.0001,#0.00001,#
     'Kmeans' : True,
     'S_random' : True,
     'S_first' : True,
@@ -50,7 +50,7 @@ crossval = ParallelMatrixCrossValidation(
     parameter_search=parameter_search,
     train_config=train_config,
     file_performance=output_file,
-    P=4
+    P=5
 )
 crossval.run()
 crossval.find_best_parameters(evaluation_criterion='MSE',low_better=True)
