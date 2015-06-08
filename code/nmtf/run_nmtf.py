@@ -10,6 +10,7 @@ Findings:
 - Kmeans initialisation (either with S=1 or S=[0,1]) gives very bad convergence
 - Updating R_pred once per iteration rather than for each S_kl gives very
   similar performance and is much faster
+- Using 'singleton' empty cluster reinitialisation is not any better (in fact, worse)
 """
 import sys
 sys.path.append("/home/thomas/Documenten/PhD/")#("/home/tab43/Documents/Projects/drug_sensitivity/")

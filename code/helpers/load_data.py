@@ -114,7 +114,9 @@ def load_features(location,delim="\t"):
     values = numpy.array(lines[0:,1:],dtype=float)
     return (values)
 
+'''
 (X,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(Sanger_file_std)#folder_Sanger+"ic50.txt")
 (I,J)= X.shape
 print I,J
 print I*J, M.sum(), M.sum()/(I*J)
+'''

@@ -14,8 +14,8 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 # Settings
 standardised = False
 
-K = 20#
-L = 5#
+K = 20
+L = 30
 
 max_iterations = 10000
 updates = 1
