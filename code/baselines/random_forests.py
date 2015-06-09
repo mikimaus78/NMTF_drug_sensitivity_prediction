@@ -7,37 +7,31 @@ We get three classes of classifiers:
  -  One per column (trained on cell line features)
  -  One overall (trained on drug+cell line features)
 
-
 Unstandardised: 
-(1 tree)    
+                Performance test set                                            Performance training set
+                MSE                 R^2                    Rp                   MSE folds
+(1 tree)            
+    Overall:   
     Drug:       
     Cell line:  
-    Overall:
-        {'R^2': 0.52081818610268837, 'MSE': 5.6041680134813916, 'Rp': 0.75234436348493916}
-        (MSE training fit: 2.65074125939, 2.64108089865, 2.7062477235, 2.66424191233, 2.62473277383)
         
 (10 trees)
+    Overall:
     Drug:       
     Cell line:  
-    Overall:
-        {'R^2': 0.66382279330707594, 'MSE': 3.9316221019364432, 'Rp': 0.81790339620515162}
-        (MSE training fit: 1.48528274561, 1.46113098926, 1.47355839296, 1.48968450238, 1.47096323709)
     
     
 Standardised:
+                    Performance test set    Performance training set
 (1 tree)    
     Drug:       
     Cell line:  
-    Overall:
-        {'R^2': -0.56502818605963934, 'MSE': 1.5646201311354495, 'Rp': 0.1551035487975784}
-        (MSE training fit: 0.753144988716, 0.734979315975, 0.752811727733, 0.763343843335, 0.757657307427)      
+    Overall:     
          
 (10 trees)
     Drug:       
     Cell line:  
     Overall:        
-        {'R^2': -0.022346523236208293, 'MSE': 1.0220555459037743, 'Rp': 0.25727955849020434}
-        (MSE training fit: 0.410628305961, 0.402244048939, 0.406781104331, 0.412605650006, 0.408939117546)
 """
 
 import sys
@@ -168,7 +162,7 @@ if __name__ == "__main__":
         
     # Gene expression profile takes up too much memory
     #cell_line_features = numpy.append(numpy.append(load_features(file_copy_variation),load_features(file_gene_expression),axis=1),load_features(file_mutation),axis=1)
-    cell_line_features = numpy.append(load_features(file_mutation),load_features(file_mutation),axis=1)
+    cell_line_features = numpy.append(load_features(file_copy_variation),load_features(file_mutation),axis=1)
     
     # Run the cross-validation on the data
     overall_performances = run_cross_validation(X,M,drug_features,cell_line_features,no_folds,classifier='overall')
