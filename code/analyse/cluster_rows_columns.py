@@ -67,6 +67,7 @@ if __name__ == "__main__":
         
     # Cluster rows and plot it
     average_counts_rows = run_all_clusterings(R=X_min, M=M, K_range=K_range_rows, N=N)
+    #average_counts_rows = [1.0, 8.1, 14.0, 17.5, 21.5, 23.7, 22.7, 26.8, 28.9, 31.5, 31.5, 33.3, 33.4, 34.8, 36.7, 38.8, 39.6, 41.7, 40.8, 43.0, 42.6, 46.8, 44.6, 44.4, 50.0, 53.7, 49.9, 56.4, 49.8, 55.2, 60.3, 59.8, 56.6, 56.0, 59.9, 62.7, 60.5, 64.2, 60.9, 63.1, 65.2, 63.8]
     plot(K_range_rows,average_counts_rows,title="Number of non-empty clusters for rows")
     
     # Cluster columns and plot it

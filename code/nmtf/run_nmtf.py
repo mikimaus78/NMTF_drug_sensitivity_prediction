@@ -27,9 +27,9 @@ standardised = False
 K = 20#50#
 L = 5#20#
 
-max_iterations = 10000
+max_iterations = 1000
 updates = 1
-epsilon_stop = 0.00001
+epsilon_stop = 0.0001
 Kmeans = True
 S_random = True
 S_first = True
