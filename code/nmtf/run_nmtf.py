@@ -24,18 +24,20 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
 # Settings
 standardised = False
 
-K = 20#50#
+K = 10#50#
 L = 5#20#
 
-max_iterations = 1000
+max_iterations = 10000
 updates = 1
-epsilon_stop = 0.0001
+epsilon_stop = 0#0.0001
+stop_validation = True
 Kmeans = True
 S_random = True
 S_first = True
 Rpred_Skl = False
 
 random.seed(0)   
+numpy.random.seed(0)
 
 output_folder = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/results/nmtf_FSG_%s_%s/" % (K,L)
 file_F = output_folder+"F.txt"
@@ -51,6 +53,7 @@ nmtf.train(
     max_iterations=max_iterations,
     updates=updates,
     epsilon_stop=epsilon_stop,
+    stop_validation=stop_validation,
     Kmeans=Kmeans,
     S_random=S_random,
     S_first=S_first,

@@ -14,7 +14,7 @@ import numpy, itertools, random
 from nmtf_i_div.code.nmtf import NMTF
 from ml_helpers.code.matrix_cross_validation import MatrixCrossValidation
 from ml_helpers.code.parallel_matrix_cross_validation import ParallelMatrixCrossValidation
-from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
+from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger, negate_Sanger
 
 
 # Settings
@@ -22,7 +22,8 @@ standardised = False
 train_config = {
     'max_iterations' : 10000,
     'updates' : 1,
-    'epsilon_stop' : 0.0001,#0.00001,#
+    'epsilon_stop' : 0.0001,#0.00001,#0.0,#
+    'stop_validation' : True,
     'Kmeans' : True,
     'S_random' : True,
     'S_first' : True,
@@ -38,7 +39,8 @@ output_file = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/resu
 parameter_search = [{'K':K,'L':L} for (K,L) in itertools.product(K_range,L_range)]
 
 # Load in the Sanger dataset
-(_,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
+(X,_,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
+X_min = negate_Sanger(X,M)
 
 # Run the cross-validation framework
 random.seed(0)

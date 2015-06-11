@@ -76,6 +76,20 @@ def load_Sanger(location=None,standardised=False):
     
     return (X,X_min,M,drug_names,cell_lines,cancer_types,tissues)
     
+
+def negate_Sanger(X,M):
+    ''' Take in the Sanger dataset, take the negative of all values, and shift
+        to positive values (+1), for interpretability. '''
+    X = -X
+    minimum = X.min()-1
+    
+    X_min = []
+    for row,row_M in zip(X,M):    
+        X_min.append([v-minimum if m else 0.0 for v,m in zip(row,row_M)])
+    X_min = numpy.array(X_min,dtype=float)
+    
+    return X_min
+    
     
 def store_Sanger(location,X,M,drug_names,cell_lines,cancer_types,tissues):
     ''' Store the data X. First line is drug names, then comes the data.

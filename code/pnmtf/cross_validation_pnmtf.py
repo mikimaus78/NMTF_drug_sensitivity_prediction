@@ -17,7 +17,7 @@ import numpy, itertools, random
 from pnmtf_i_div.code.pnmtf import PNMTF
 from ml_helpers.code.matrix_cross_validation import MatrixCrossValidation
 from ml_helpers.code.parallel_matrix_cross_validation import ParallelMatrixCrossValidation
-from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger, load_kernels
+from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger, load_kernels, negate_Sanger
 
 
 # Settings
@@ -34,8 +34,8 @@ train_config = {
 }
 K = 20
 L = 30
-alpha_range = [0, 0.01, 0.05, 0.1, 0.5, 1, 5]
-beta_range = [0, 0.01, 0.05, 0.1, 0.5, 1, 5]
+alpha_range = [0.01, 0.1, 1, 10, 100]
+beta_range = [0.01, 0.1, 1, 10, 100]
 no_folds = 5
 
 random.seed(0)   
@@ -45,7 +45,8 @@ output_file = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/resu
 location_kernels = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/kernels/"
 
 # Load in the Sanger dataset
-(_,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
+(X,_,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
+X_min = negate_Sanger(X,M)
 
 # Load in the kernels
 C1 = load_kernels(location_kernels,["copy_variation","gene_expression","mutation"]) #cell lines

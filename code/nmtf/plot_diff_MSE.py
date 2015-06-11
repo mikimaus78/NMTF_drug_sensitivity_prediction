@@ -8,18 +8,19 @@ import numpy, itertools, random
 from matplotlib import pyplot
 from nmtf_i_div.code.nmtf import NMTF
 from ml_helpers.code import mask
-from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger
+from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger, negate_Sanger
 
 
 # Settings
 standardised = False
 
 K = 20
-L = 30
+L = 5
 
 max_iterations = 10000
 updates = 1
 epsilon_stop = 0.00001
+stop_validation = True
 Kmeans = True
 S_random = True
 S_first = True
@@ -30,7 +31,8 @@ random.seed(0)
 no_folds = 5 # hold back 20% of the data for performance evaluation
 
 # Load in the Sanger dataset
-(_,X_min,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
+(X,_,M,drug_names,cell_lines,cancer_types,tissues) = load_Sanger(standardised=standardised)
+X_min = negate_Sanger(X,M)
 (I,J) = X_min.shape
     
 # Split into training and test datasets
@@ -44,6 +46,7 @@ nmtf.train(
     max_iterations=max_iterations,
     updates=updates,
     epsilon_stop=epsilon_stop,
+    stop_validation=stop_validation,
     Kmeans=Kmeans,
     S_random=S_random,
     S_first=S_first,

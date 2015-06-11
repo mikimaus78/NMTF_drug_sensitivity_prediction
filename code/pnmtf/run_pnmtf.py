@@ -58,6 +58,9 @@ for c2 in C2:
 C1 = numpy.multiply(C1,alpha)
 C2 = numpy.multiply(C2,beta)    
     
+    
+TODO: MULTIPLY KERNELS?!?!    
+    
 
 # Train the classifier
 pnmtf = PNMTF(X_min,M,K,L,C1,C2)
