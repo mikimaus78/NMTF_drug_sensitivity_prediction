@@ -30,7 +30,7 @@ train_config = {
     'M_test' : None,
     'Rpred_Skl' : False
 }
-K_range = [10,20,30,40,50,60,70,80]#[5,10,15,20,25,30,35,40,45,50]
+K_range = [10,20,30,40,50,60]#[5,10,15,20,25,30,35,40,45,50]
 L_range = [5,10,15,20,25,30]#[5,10,15,20,25]
 no_folds = 5
 output_file = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/results/cross_validation_nmtf/crossval_nmtf_%s.txt" % ("std" if standardised else "notstd")

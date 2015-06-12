@@ -26,6 +26,7 @@ train_config = {
     'max_iterations' : 10000,
     'updates' : 1,
     'epsilon_stop' : 0.0001,#0.00001,#
+    'stop_validation' : True,
     'Kmeans' : True,
     'S_random' : True,
     'S_first' : True,
@@ -34,12 +35,12 @@ train_config = {
 }
 K = 20
 L = 30
-alpha_range = [0.01, 0.1, 1, 10, 100]
-beta_range = [0.01, 0.1, 1, 10, 100]
+alpha_range = [0,0.01, 0.1, 1, 10, 100]
+beta_range = [0,0.01, 0.1, 1, 10, 100]
 no_folds = 5
 
-random.seed(0)   
-numpy.random.seed(0)
+random.seed(1)   
+numpy.random.seed(1)
 
 output_file = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/results/cross_validation_pnmtf/crossval_pnmtf_%s.txt" % ("std" if standardised else "notstd")
 location_kernels = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/kernels/"
@@ -60,8 +61,6 @@ for c1 in C1:
 for c2 in C2:
     numpy.fill_diagonal(c2,0)
     
-print C1
-
 # Construct the parameter search
 parameter_search = [{'K':K,'L':L,'C1':numpy.multiply(C1,alpha),'C2':numpy.multiply(C2,beta)} for (alpha,beta) in itertools.product(alpha_range,beta_range)]
 

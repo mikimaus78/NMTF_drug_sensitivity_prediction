@@ -17,12 +17,13 @@ standardised = False
 K = 20#50#
 L = 5#20#
 
-alpha = 0
-beta = 0
+alpha = 1
+beta = 1
 
-max_iterations = 1000
+max_iterations = 10000
 updates = 1
-epsilon_stop = 0.0001
+epsilon_stop = 0.00001
+stop_validation = True,
 Kmeans = True
 S_random = True
 S_first = True
@@ -57,17 +58,24 @@ for c2 in C2:
 # Multiply the kernels by alpha, beta
 C1 = numpy.multiply(C1,alpha)
 C2 = numpy.multiply(C2,beta)    
-    
-    
-TODO: MULTIPLY KERNELS?!?!    
-    
 
+# We can also multiply the matrices together - not any better performance it seems, but may be worth running this all twice anyways
+def multiply_matrices(l):
+    result = l[0]
+    for l2 in l[1:]:
+        result *= l2
+    return result
+    
+C1_mult = [multiply_matrices(C1)]
+C2_mult = [multiply_matrices(C2)]
+    
 # Train the classifier
-pnmtf = PNMTF(X_min,M,K,L,C1,C2)
+pnmtf = PNMTF(X_min,M,K,L,C1,C2)#C1_mult,C2_mult)
 pnmtf.train(
     max_iterations=max_iterations,
     updates=updates,
     epsilon_stop=epsilon_stop,
+    stop_validation=stop_validation,
     Kmeans=Kmeans,
     S_random=S_random,
     S_first=S_first,
