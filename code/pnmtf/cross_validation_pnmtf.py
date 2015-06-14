@@ -5,8 +5,8 @@ dataset. We fix the value of K and L, and search for alpha and beta.
 Since we want to find co-clusters of significantly higher/lower drug sensitivity
 values, we should use the unstandardised Sanger dataset.
 
-For alpha we use the values [0,0.01,0.05,0.1,0.5,1,5]. Above <N> the performance drops.
-For beta we use the values [0,0.01,0.05,0.1,0.5,1,5]. Above <N> the performance drops.
+For alpha we use the values [0,0.01,0.1,1,10,100].
+For beta we use the values [0,0.01,0.1,1,10,100].
 """
 
 import sys
