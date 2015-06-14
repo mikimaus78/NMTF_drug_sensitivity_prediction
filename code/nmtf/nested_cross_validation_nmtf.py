@@ -20,7 +20,7 @@ standardised = False
 train_config = {
     'max_iterations' : 10000,
     'updates' : 1,
-    'epsilon_stop' : 0.0001,#0.0,#
+    'epsilon_stop' : 0.0,#0.0001,#
     'stop_validation' : True,
     'Kmeans' : True,
     'S_random' : True,
@@ -28,7 +28,7 @@ train_config = {
     'M_test' : None,
     'Rpred_Skl' : False
 }
-K_range = [10,20,30]#[10,20,30,40]#
+K_range = [10,15,20]#[10,20,30,40]#
 L_range = [20,25,30]#[5,10,15,20,25,30,35,40]#
 no_folds = 5
 output_file = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/results/nested_cross_validation_nmtf/results.txt"

@@ -15,15 +15,15 @@ from NMTF_drug_sensitivity_prediction.code.helpers.load_data import load_Sanger,
 standardised = False
 
 K = 20#50#
-L = 5#20#
+L = 30#20#
 
-alpha = 1
-beta = 1
+alpha = 10
+beta = 10
 
 max_iterations = 10000
 updates = 1
-epsilon_stop = 0.00001
-stop_validation = True,
+epsilon_stop = 0.0001
+stop_validation = True
 Kmeans = True
 S_random = True
 S_first = True

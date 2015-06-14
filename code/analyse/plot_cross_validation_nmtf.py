@@ -13,13 +13,13 @@ from matplotlib import pyplot
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm                   # For colourmap
 
-location_file = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/results/"
+location_file = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/results/cross_validation_nmtf/"
 file_name_not_std = location_file+"crossval_nmtf_notstd.txt"
 
 # Extract the performances, and return a tuple of two lists: [(K,L)], [{'MSE':MSE,'R^2':R2,'Rp':Rp}]
 def extract_performances(location_file):
     fin = open(location_file,'r')
-    lines = fin.readlines()
+    lines = fin.readlines()[:-1] # remove last line with best performance
     lines = [line for i,line in enumerate(lines) if i % 2 == 0]
     lines = [line.split("Tried parameters ")[1] for line in lines]
     lines = [line.split(". \n")[0].split(". Average performances: ") for line in lines]
