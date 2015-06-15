@@ -10,11 +10,11 @@ Nz <- 139
 
 # Load in the drug sensitivity values
 folder_drug_sensitivity <- '/home/thomas/Dropbox/Biological databases/Sanger_drug_sensivitity/'
-name_drug_sensitivity <- 'ic50_excl_empty_filtered_cell_lines_drugs_standardised.txt'
-Y <- read.table(paste(folder_drug_sensitivity,name_drug_sensitivity,sep=''),
+name_drug_sensitivity <- 'ic50_excl_empty_filtered_cell_lines_drugs.txt'
+Y <- as.matrix(read.table(paste(folder_drug_sensitivity,name_drug_sensitivity,sep=''),
 				header=TRUE,
 				sep='\t',
-				colClasses=c(rep("NULL",3), rep("numeric",139)))
+				colClasses=c(rep("NULL",3), rep("numeric",139))))
 
 # Load in the kernels - X = cancer cell lines, Z = drugs
 folder_kernels <- '/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/data/kernels/'
@@ -37,15 +37,17 @@ Kz[,, 1] <- kernel_1d2d
 Kz[,, 2] <- kernel_fingerprints
 Kz[,, 3] <- kernel_targets
 
-print(Y)
-
 state <- kbmf_regression_train(Kx, Kz, Y, 5)
 prediction <- kbmf_regression_test(Kx, Kz, state)
 
-# print(sprintf("RMSE = %.4f", sqrt(mean((prediction$Y$mu - Y)^2))))
+print(prediction$Y$mu)
 
-# print("kernel weights on X")
-# print(state$ex$mu)
+print(sprintf("MSE = %.4f", mean((prediction$Y$mu - Y)^2, na.rm=TRUE )))
+# 200 iterations: "MSE = 2.0170"
+# 1000 iterations: "MSE = "
 
-# print("kernel weights on Z")
-# print(state$ez$mu)
+print("kernel weights on X")
+print(state$ex$mu)
+
+print("kernel weights on Z")
+print(state$ez$mu)
