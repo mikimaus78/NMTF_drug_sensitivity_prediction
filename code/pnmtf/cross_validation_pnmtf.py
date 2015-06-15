@@ -35,7 +35,7 @@ train_config = {
 }
 K = 20
 L = 30
-alpha_range = [1,10,100]#[0, 0.01, 0.1, 1, 10, 100]
+alpha_range = [0, 0.01, 0.1, 1, 10, 100]
 beta_range = [0, 0.01, 0.1, 1, 10, 100]
 no_folds = 5
 

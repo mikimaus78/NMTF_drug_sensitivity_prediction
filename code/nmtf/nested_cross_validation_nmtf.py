@@ -43,7 +43,8 @@ parameter_search = [{'K':K,'L':L} for (K,L) in itertools.product(K_range,L_range
 X_min = negate_Sanger(X,M)
 
 # Run the cross-validation framework
-random.seed(0)
+random.seed(42)
+numpy.random.seed(9000)
 nested_crossval = MatrixNestedCrossValidation(
     method=NMTF,
     X=X_min,
