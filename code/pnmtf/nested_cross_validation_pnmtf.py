@@ -144,9 +144,9 @@ if __name__ == "__main__":
         'M_test' : None,
         'Rpred_Skl' : False
     }
-    K_range = [10,20]
-    L_range = [20,30]
-    alpha_range = [0.01,0.1,1]
+    K_range = [10,15,20]
+    L_range = [20,25,30]
+    alpha_range = [0.01,0.1,1,10]
     beta_range = [0]
     no_folds = 5
     output_file = "/home/thomas/Documenten/PhD/NMTF_drug_sensitivity_prediction/results/nested_cross_validation_pnmtf/results.txt"

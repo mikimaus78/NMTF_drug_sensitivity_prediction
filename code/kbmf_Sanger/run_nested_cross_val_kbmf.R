@@ -1,8 +1,8 @@
-setwd("../kbmf/")
-source("kbmf_regression_train.R")
-source("kbmf_regression_test.R")
+# Run the cross-validation for KBMF
 
-set.seed(1606)
+source("nested_cross_val_kbmf.R")
+K <- 5
+R_values <- c(5,10,15,20,25,30,35,40,45,50)
 
 Px <- 3
 Nx <- 622
@@ -38,20 +38,5 @@ Kz[,, 1] <- kernel_1d2d
 Kz[,, 2] <- kernel_fingerprints
 Kz[,, 3] <- kernel_targets
 
-# Train the model, and test the performance on the training data
-state <- kbmf_regression_train(Kx, Kz, Y, 20)
-prediction <- kbmf_regression_test(Kx, Kz, state)
-
-print(prediction$Y$mu)
-
-print(sprintf("MSE = %.4f", mean((prediction$Y$mu - Y)^2, na.rm=TRUE )))
-# R=5, 200 iterations: "MSE = 2.0170"
-# R=5, 1000 iterations: "MSE = 2.0131"
-# R=10, 200 iterations: "MSE = 1.5736"
-# R=20, 200 iterations: "MSE = 1.1130"
-
-print("kernel weights on X")
-print(state$ex$mu)
-
-print("kernel weights on Z")
-print(state$ez$mu)
+# Run the cross-validation
+kbmf_nested_cross_validation(Kx, Kz, Y, R_values, K)

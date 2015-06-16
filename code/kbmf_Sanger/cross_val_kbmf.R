@@ -54,10 +54,6 @@ create_train_test_sets <- function(folds,Y) {
 }
 
 kbmf_cross_validation <- function(Kx, Kz, Y, R_values, K) {
-
-	print(R_values)
-	print(seq(R_values))
-
 	# For each value R in R_values, split the data into K folds, and use K-1 folds to train and test on the remaining folds
 	all_MSEs = list()
 	all_R2s = list()
@@ -84,10 +80,13 @@ kbmf_cross_validation <- function(Kx, Kz, Y, R_values, K) {
 			prediction <- kbmf_regression_test(Kx, Kz, state)$Y$mu
 
 			MSE = mean((prediction - test)^2, na.rm=TRUE )
-			R2 = 0
-			Rp = 0
-			print(sprintf("Performance on fold %i: MSE=%.4f, R^2=%.4f, Rp=%.4f.", f,MSE,R2,Rp))
+			mean_test = mean(test, na.rm=TRUE )
+			R2 = 1 - ( sum( (test - prediction)^2, na.rm=TRUE ) / sum( (test - mean_test)^2, na.rm=TRUE ) )
+			mean_pred = mean( prediction, na.rm=TRUE )
+			Rp = cor(c(test),c(prediction),use='pairwise.complete.obs',method='pearson')
+			#Rp = sum( (test - mean_test) * (prediction - mean_pred) , na.rm=TRUE ) / ( sqrt( sum( (test - mean_test)^2 , na.rm=TRUE ) ) * sqrt( sum( (prediction - mean_pred)^2 , na.rm=TRUE ) ) )
 
+			print(sprintf("Performance on fold %i: MSE=%.4f, R^2=%.4f, Rp=%.4f.", f,MSE,R2,Rp))
 			MSEs = c(MSEs,MSE)
 			R2s = c(R2s,R2)
 			Rps = c(Rps,Rp)

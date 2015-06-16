@@ -1,0 +1,3 @@
+Finished fold 1, with performances {'R^2': 0.8072341934000542, 'MSE': 2.2382353519656801, 'Rp': 0.89944328839754362}. 
+Finished fold 2, with performances {'R^2': 0.8056555017409838, 'MSE': 2.2746093096172166, 'Rp': 0.89770652579120491}. 
+Finished fold 3, with performances {'R^2': 0.805982438498417, 'MSE': 2.245380541814018, 'Rp': 0.89834131008625839}. 

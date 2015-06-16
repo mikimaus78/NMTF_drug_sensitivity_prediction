@@ -2,7 +2,7 @@
 
 source("cross_val_kbmf.R")
 K <- 5
-R_values <- c(5,10,15,20,25,30,35,40,45,50)
+R_values <- c(5,10,15,20,30,40,50)
 
 Px <- 3
 Nx <- 622
@@ -40,3 +40,6 @@ Kz[,, 3] <- kernel_targets
 
 # Run the cross-validation
 kbmf_cross_validation(Kx, Kz, Y, R_values, K)
+
+# Results:
+# 
