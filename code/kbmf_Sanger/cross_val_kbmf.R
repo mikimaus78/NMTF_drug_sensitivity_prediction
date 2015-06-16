@@ -54,26 +54,58 @@ create_train_test_sets <- function(folds,Y) {
 }
 
 kbmf_cross_validation <- function(Kx, Kz, Y, R_values, K) {
+
+	print(R_values)
+	print(seq(R_values))
+
 	# For each value R in R_values, split the data into K folds, and use K-1 folds to train and test on the remaining folds
+	all_MSEs = list()
+	all_R2s = list()
+	all_Rps = list()
 	for (i in seq(R_values)) {
+		R = R_values[[i]]
+    		print(sprintf("Trying R=%i", R))
+
 		sets = create_train_test_sets(split_dataset(Y, K), Y)
 		training_sets = sets[[1]]
 		test_sets = sets[[2]]
 
 		# For each fold, test the performance
+		MSEs = list()
+		R2s = list()
+		Rps = list()
 		for (f in seq(training_sets)) {
+			print(sprintf("Fold %i.", f))
+
 			train = training_sets[[f]]
 			test = test_sets[[f]]
 
-			state <- kbmf_regression_train(Kx, Kz, train, 20)
+			state <- kbmf_regression_train(Kx, Kz, train, R)
 			prediction <- kbmf_regression_test(Kx, Kz, state)$Y$mu
 
 			MSE = mean((prediction - test)^2, na.rm=TRUE )
-			print(MSE)
+			R2 = 0
+			Rp = 0
+			print(sprintf("Performance on fold %i: MSE=%.4f, R^2=%.4f, Rp=%.4f.", f,MSE,R2,Rp))
+
+			MSEs = c(MSEs,MSE)
+			R2s = c(R2s,R2)
+			Rps = c(Rps,Rp)
 		}
+
+		average_MSE = mean(unlist(MSEs))
+		all_MSEs = c(all_MSEs,average_MSE)
+		average_R2 = mean(unlist(R2s))
+		all_R2s = c(all_R2s,average_R2)
+		average_Rp = mean(unlist(Rps))
+		all_Rps = c(all_Rps,average_Rp)
+		print(sprintf("Average performances for R=%i: MSE=%.4f, R^2=%.4f, Rp=%.4f.", R,average_MSE,average_R2,average_Rp))
 	}
 
-
+	# Find the best value for R, and return it
+	best_R = R_values[[which.min(all_MSEs)]]
+	print(sprintf("Best performance achieved with R=%i.", R))
+	return(list(best_R, unlist(all_MSEs), unlist(all_R2s), unlist(all_Rps)))
 }
 
 
