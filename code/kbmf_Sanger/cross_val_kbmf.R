@@ -103,7 +103,7 @@ kbmf_cross_validation <- function(Kx, Kz, Y, R_values, K) {
 
 	# Find the best value for R, and return it
 	best_R = R_values[[which.min(all_MSEs)]]
-	print(sprintf("Best performance achieved with R=%i.", R))
+	print(sprintf("Best performance achieved with R=%i.", best_R))
 	return(list(best_R, unlist(all_MSEs), unlist(all_R2s), unlist(all_Rps)))
 }
 

@@ -39,12 +39,9 @@ kbmf_nested_cross_validation <- function(Kx, Kz, Y, R_values, K) {
 	
 	# Compute the average performances, and return that.
 	average_MSE = mean(unlist(MSEs))
-	all_MSEs = c(all_MSEs,average_MSE)
 	average_R2 = mean(unlist(R2s))
-	all_R2s = c(all_R2s,average_R2)
 	average_Rp = mean(unlist(Rps))
-	all_Rps = c(all_Rps,average_Rp)
-	print(sprintf("Performances nested cross-validation: MSE=%.4f, R^2=%.4f, Rp=%.4f.", R,average_MSE,average_R2,average_Rp))
+	print(sprintf("Performances nested cross-validation: MSE=%.4f, R^2=%.4f, Rp=%.4f.",average_MSE,average_R2,average_Rp))
 	return(list(average_MSE, average_R2, average_Rp))
 }
 

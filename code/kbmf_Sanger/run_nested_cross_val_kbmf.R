@@ -2,7 +2,7 @@
 
 source("nested_cross_val_kbmf.R")
 K <- 5
-R_values <- c(5,10,15,20,25,30,35,40,45,50)
+R_values <- c(5,10,20,30)
 
 Px <- 3
 Nx <- 622
