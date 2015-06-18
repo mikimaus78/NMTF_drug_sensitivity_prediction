@@ -28,7 +28,8 @@ kbmf_nested_cross_validation <- function(Kx, Kz, Y, R_values, K) {
 		mean_test = mean( test, na.rm=TRUE )
 		R2 = 1 - ( sum( (test - prediction)^2, na.rm=TRUE ) / sum( (test - mean_test)^2, na.rm=TRUE ) )
 		mean_pred = mean( prediction, na.rm=TRUE )
-		Rp = sum( (test - mean_test) * (prediction - mean_pred) , na.rm=TRUE ) / ( sqrt( sum( (test - mean_test)^2 , na.rm=TRUE ) ) * sqrt( sum( (prediction - mean_pred)^2 , na.rm=TRUE ) ) )
+		Rp = cor(c(test),c(prediction),use='pairwise.complete.obs',method='pearson')
+		#Rp = sum( (test - mean_test) * (prediction - mean_pred) , na.rm=TRUE ) / ( sqrt( sum( (test - mean_test)^2 , na.rm=TRUE ) ) * sqrt( sum( (prediction - mean_pred)^2 , na.rm=TRUE ) ) )
 		print(sprintf("Performance on fold %i: MSE=%.4f, R^2=%.4f, Rp=%.4f.", f,MSE,R2,Rp))
 
 		# Store the performance
